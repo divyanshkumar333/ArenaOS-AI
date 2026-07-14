@@ -21,7 +21,8 @@ export default function DashboardOS() {
   useEffect(() => {
     let ws: WebSocket, t: NodeJS.Timeout
     const connect = () => {
-      ws = new WebSocket(`${process.env.NEXT_PUBLIC_API_URL.replace(/^http/, 'ws')}/ws/telemetry`)
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? ''
+      ws = new WebSocket(`${apiUrl.replace(/^http/, 'ws')}/ws/telemetry`)
       ws.onopen = () => setIsConnected(true)
       ws.onmessage = e => {
         const d = JSON.parse(e.data)
