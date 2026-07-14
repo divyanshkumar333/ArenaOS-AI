@@ -4,7 +4,7 @@ import { LayoutGrid, Activity, Users, ShieldAlert, Settings, HardDrive, Radio, L
 import { useZoneStore } from '@/store/useZoneStore'
 import { useState, useEffect } from 'react'
 
-export function Sidebar() {
+export function Sidebar({ closeMenu }: { closeMenu?: () => void }) {
   const systemStatus = useZoneStore(state => state.systemStatus)
   const activeItem = useZoneStore(state => state.activeTab)
   const setActiveItem = useZoneStore(state => state.setActiveTab)
@@ -72,7 +72,7 @@ export function Sidebar() {
             return (
               <button 
                 key={item.name} 
-                onClick={() => setActiveItem(item.name)}
+                onClick={() => { setActiveItem(item.name); closeMenu?.(); } }
                 className={`w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-all duration-200 text-left ${isActive ? 'bg-accent/10 text-accent border border-accent/25 font-semibold' : 'text-white/60 hover:bg-white/5 hover:text-white border border-transparent'}`}
               >
                 <item.icon className="w-3 h-3 shrink-0" />
@@ -89,7 +89,7 @@ export function Sidebar() {
             return (
               <button 
                 key={item.name} 
-                onClick={() => setActiveItem(item.name)}
+                onClick={() => { setActiveItem(item.name); closeMenu?.(); } }
                 className={`w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-all duration-200 text-left ${isActive ? 'bg-accent/10 text-accent border border-accent/25 font-semibold' : 'text-white/60 hover:bg-white/5 hover:text-white border border-transparent'}`}
               >
                 <item.icon className="w-3 h-3 shrink-0" />
