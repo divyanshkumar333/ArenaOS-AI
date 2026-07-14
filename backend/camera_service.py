@@ -10,23 +10,29 @@ import time
 class CameraService:
     def __init__(self):
         self.cap = None
-        self.face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+        if cv2 is not None:
+            self.face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+        else:
+            self.face_cascade = None
         self.current_count = 0
         self.is_running = False
         self.lock = threading.Lock()
         self.frame_bytes = None
 
     def start(self):
-        if not self.is_running:
-            if cv2 is None:
-            # No OpenCV support; skip webcam initialization
+        # Prevent double start
+        if self.is_running:
+            return
+        # If OpenCV not available, disable service gracefully
+        if cv2 is None:
             self.is_running = False
             import warnings
             warnings.warn("Camera service disabled due to missing OpenCV.")
             return
+        # Initialize webcam
         self.cap = cv2.VideoCapture(0)
-            self.is_running = True
-            threading.Thread(target=self._update_loop, daemon=True).start()
+        self.is_running = True
+        threading.Thread(target=self._update_loop, daemon=True).start()
 
     def _update_loop(self):
         while self.is_running:
