@@ -161,7 +161,7 @@ export const KPICards = React.memo(function KPICards() {
         return (
           <div
             key={i}
-            className="relative flex flex-col p-3.5 bg-[rgba(10,10,12,0.4)] backdrop-blur-2xl border border-white/[0.04] rounded-xl overflow-hidden group transition-all duration-300 hover:border-white/10"
+            className="relative flex flex-col p-2.5 md:p-3.5 bg-[rgba(10,10,12,0.4)] backdrop-blur-2xl border border-white/[0.04] rounded-xl overflow-hidden group transition-all duration-300 hover:border-white/10"
           >
             {/* Top border glow themed */}
             <div className="absolute top-0 left-0 right-0 h-[2px] opacity-60 transition-opacity duration-300 group-hover:opacity-100" style={{ backgroundColor: c.color }} />
@@ -175,9 +175,9 @@ export const KPICards = React.memo(function KPICards() {
             <MiniSparkline color={c.color} data={c.history} />
 
             <div className="flex justify-between items-start relative z-10">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1 md:gap-1.5">
                 <c.icon size={7} className="text-white/60 transition-colors" />
-                <span className="text-xs font-medium text-white/60">{c.title}</span>
+                <span className="text-[10px] md:text-xs font-medium text-white/60 leading-none">{c.title}</span>
               </div>
 
               <div className="flex items-center gap-1.5 bg-black/40 px-2 py-0.5 rounded-full border border-white/5">
@@ -190,8 +190,12 @@ export const KPICards = React.memo(function KPICards() {
               </div>
             </div>
 
-            <div className={`flex items-baseline gap-2 ${i === 0 ? 'mt-2.5' : 'mt-1.5'} relative z-10`}>
-              <h3 className={`font-sans tracking-tight text-white ${i === 0 ? 'text-4xl font-light' : 'text-xl font-light'}`}>
+            <div className={`flex items-baseline gap-1.5 md:gap-2 ${i === 0 ? 'mt-2 md:mt-2.5' : 'mt-1'} relative z-10`}>
+              <h3 className={`font-sans tracking-tight text-white ${
+                i === 0
+                  ? 'text-3xl md:text-4xl font-light'
+                  : 'text-lg md:text-xl font-light'
+              }`}>
                 <AnimatedNumber value={c.value} />
               </h3>
 
@@ -204,8 +208,8 @@ export const KPICards = React.memo(function KPICards() {
               )}
             </div>
 
-            <div className="mt-auto pt-2.5 relative z-10">
-              <p className="text-[10px] font-medium text-white/50 border-t border-white/[0.08] pt-1.5">
+            <div className="mt-auto pt-1.5 md:pt-2.5 relative z-10">
+              <p className="text-[9px] md:text-[10px] font-medium text-white/50 border-t border-white/[0.08] pt-1 md:pt-1.5">
                 {c.subtext}
               </p>
             </div>

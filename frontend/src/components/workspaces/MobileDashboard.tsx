@@ -103,63 +103,78 @@ export function MobileDashboard() {
         </div>
       </div>
 
-      {/* Bottom Navigation Bar */}
+      {/* Bottom Navigation Bar — 64px nominal height, safe-area below */}
       <nav
-        className="absolute bottom-0 left-0 w-full z-40 bg-black/85 backdrop-blur-xl border-t border-white/[0.08] pb-safe px-2 pt-2 flex justify-around items-center"
+        className="absolute bottom-0 left-0 w-full z-40 bg-black/80 backdrop-blur-2xl border-t border-white/[0.06]"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         aria-label="Mobile navigation"
       >
-        {/* Digital Twin */}
-        <button
-          onClick={() => setActiveSheet(null)}
-          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors ${
-            !activeSheet ? 'text-accent bg-accent/10' : 'text-gray-500'
-          }`}
-          aria-label="Digital Twin view"
-        >
-          <Radar className="w-5 h-5" />
-          <span className="text-[9px] uppercase tracking-wider font-mono">Twin</span>
-        </button>
-
-        {/* AI Copilot */}
-        <button
-          onClick={() => setActiveSheet('copilot')}
-          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors ${
-            activeSheet === 'copilot' ? 'text-accent bg-accent/10' : 'text-gray-500'
-          }`}
-          aria-label="AI Copilot"
-        >
-          <div className="relative">
-            <Bot className="w-5 h-5" />
-            {activeIncident && (
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+        <div className="flex justify-around items-center h-16 px-1">
+          {/* Digital Twin */}
+          <button
+            onClick={() => setActiveSheet(null)}
+            className={`flex flex-col items-center justify-center gap-0.5 w-16 h-12 rounded-xl transition-all duration-200 ${
+              !activeSheet ? 'text-accent' : 'text-white/35'
+            }`}
+            aria-label="Digital Twin view"
+          >
+            {!activeSheet && (
+              <span className="absolute w-10 h-8 rounded-lg bg-accent/10 shadow-[0_0_12px_rgba(10,132,255,0.25)]" />
             )}
-          </div>
-          <span className="text-[9px] uppercase tracking-wider font-mono">Copilot</span>
-        </button>
+            <Radar className="relative w-5 h-5" strokeWidth={1.75} />
+            <span className="relative text-[10px] font-medium tracking-wide">Twin</span>
+          </button>
 
-        {/* Live Telemetry */}
-        <button
-          onClick={() => setActiveSheet('telemetry')}
-          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors ${
-            activeSheet === 'telemetry' ? 'text-accent bg-accent/10' : 'text-gray-500'
-          }`}
-          aria-label="Live telemetry"
-        >
-          <Activity className="w-5 h-5" />
-          <span className="text-[9px] uppercase tracking-wider font-mono">Sensors</span>
-        </button>
+          {/* AI Copilot */}
+          <button
+            onClick={() => setActiveSheet('copilot')}
+            className={`relative flex flex-col items-center justify-center gap-0.5 w-16 h-12 rounded-xl transition-all duration-200 ${
+              activeSheet === 'copilot' ? 'text-accent' : 'text-white/35'
+            }`}
+            aria-label="AI Copilot"
+          >
+            {activeSheet === 'copilot' && (
+              <span className="absolute w-10 h-8 rounded-lg bg-accent/10 shadow-[0_0_12px_rgba(10,132,255,0.25)]" />
+            )}
+            <span className="relative">
+              <Bot className="w-5 h-5" strokeWidth={1.75} />
+              {activeIncident && (
+                <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-red-500 rounded-full" />
+              )}
+            </span>
+            <span className="relative text-[10px] font-medium tracking-wide">Copilot</span>
+          </button>
 
-        {/* Sidebar / Menu */}
-        <button
-          onClick={() => setActiveSheet('menu')}
-          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors ${
-            activeSheet === 'menu' ? 'text-accent bg-accent/10' : 'text-gray-500'
-          }`}
-          aria-label="Navigation menu"
-        >
-          <Menu className="w-5 h-5" />
-          <span className="text-[9px] uppercase tracking-wider font-mono">Menu</span>
-        </button>
+          {/* Live Telemetry */}
+          <button
+            onClick={() => setActiveSheet('telemetry')}
+            className={`flex flex-col items-center justify-center gap-0.5 w-16 h-12 rounded-xl transition-all duration-200 ${
+              activeSheet === 'telemetry' ? 'text-accent' : 'text-white/35'
+            }`}
+            aria-label="Live telemetry"
+          >
+            {activeSheet === 'telemetry' && (
+              <span className="absolute w-10 h-8 rounded-lg bg-accent/10 shadow-[0_0_12px_rgba(10,132,255,0.25)]" />
+            )}
+            <Activity className="relative w-5 h-5" strokeWidth={1.75} />
+            <span className="relative text-[10px] font-medium tracking-wide">Sensors</span>
+          </button>
+
+          {/* Menu */}
+          <button
+            onClick={() => setActiveSheet('menu')}
+            className={`flex flex-col items-center justify-center gap-0.5 w-16 h-12 rounded-xl transition-all duration-200 ${
+              activeSheet === 'menu' ? 'text-accent' : 'text-white/35'
+            }`}
+            aria-label="Navigation menu"
+          >
+            {activeSheet === 'menu' && (
+              <span className="absolute w-10 h-8 rounded-lg bg-accent/10 shadow-[0_0_12px_rgba(10,132,255,0.25)]" />
+            )}
+            <Menu className="relative w-5 h-5" strokeWidth={1.75} />
+            <span className="relative text-[10px] font-medium tracking-wide">Menu</span>
+          </button>
+        </div>
       </nav>
 
       {/* Bottom Sheets */}
