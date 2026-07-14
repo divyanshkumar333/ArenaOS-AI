@@ -497,7 +497,7 @@ export function StadiumCanvas() {
       <div ref={vantaRef} className="absolute inset-0" style={{ zIndex: 0 }} />
 
       {/* Canvas */}
-      <Canvas dpr={isMobile ? [1, 1] : [1, 2]} camera={isMobile ? { position: [180, 130, 180], fov: 45 } : { position: [250, 180, 250], fov: 38 }} shadows={!isMobile} gl={{ alpha: true, antialias: !isMobile }} style={{ position: 'relative', zIndex: 1, background: 'transparent' }}>
+      <Canvas dpr={isMobile ? [1, 1] : [1, 2]} camera={{ position: [250, 180, 250], fov: 38 }} shadows={!isMobile} gl={{ alpha: true, antialias: !isMobile }} style={{ position: 'relative', zIndex: 1, background: 'transparent' }}>
         <fog attach="fog" args={['#050510', 800, 1800]} />
 
         {/* Cinematic ambient and fill lights */}

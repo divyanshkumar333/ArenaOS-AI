@@ -8,7 +8,7 @@ import { CommandCenterWorkspace } from '@/components/workspaces/CommandCenterWor
 import { InfrastructureWorkspace } from '@/components/workspaces/InfrastructureWorkspace'
 import dynamic from 'next/dynamic'
 
-import MobileDashboard from '@/components/workspaces/MobileDashboard'
+import { MobileDashboard } from '@/components/workspaces/MobileDashboard'
 import { useIsMobile } from '@/hooks/useMediaQuery'
 
 const ScenarioComparison = dynamic(() => import('@/components/ScenarioComparison').then(m => m.ScenarioComparison), { ssr: false })

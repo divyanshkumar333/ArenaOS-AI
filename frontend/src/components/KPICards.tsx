@@ -1,4 +1,5 @@
-// 'use client'
+'use client'
+
 import React, { useEffect, useState } from 'react'
 import { useZoneStore } from '@/store/useZoneStore'
 import { Users, ShieldAlert, TrendingUp, Clock, Zap, HeartPulse, ArrowUpRight, ArrowDownRight } from 'lucide-react'
@@ -155,50 +156,62 @@ export const KPICards = React.memo(function KPICards() {
   ]
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 w-full gap-2 pb-2">
-      {cardData.map((c, i) => (
-        <div
-          key={i}
-          className="relative flex flex-col p-1.5 bg-[rgba(10,10,12,0.4)] backdrop-blur-2xl border border-white/[0.04] rounded-xl overflow-hidden group transition-all duration-300 hover:border-white/10"
-          style={{ aspectRatio: '1.0' }}
-        >
-          <div className="absolute top-0 left-0 right-0 h-[2px] opacity-60 transition-opacity duration-300 group-hover:opacity-100" style={{ backgroundColor: c.color }} />
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none" style={{ background: `radial-gradient(circle at top, ${c.color} 0%, transparent 60%)` }} />
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 w-full gap-3 pb-2">
+      {cardData.map((c, i) => {
+        return (
+          <div
+            key={i}
+            className="relative flex flex-col p-3.5 bg-[rgba(10,10,12,0.4)] backdrop-blur-2xl border border-white/[0.04] rounded-xl overflow-hidden group transition-all duration-300 hover:border-white/10"
+          >
+            {/* Top border glow themed */}
+            <div className="absolute top-0 left-0 right-0 h-[2px] opacity-60 transition-opacity duration-300 group-hover:opacity-100" style={{ backgroundColor: c.color }} />
 
-          <MiniSparkline color={c.color} data={c.history} />
+            {/* Background Glow based on card theme */}
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none"
+              style={{ background: `radial-gradient(circle at top, ${c.color} 0%, transparent 60%)` }}
+            />
 
-          <div className="flex justify-between items-start relative z-10">
-            <div className="flex items-center gap-1 md:gap-1.5">
-              <c.icon size={7} className="text-white/60 transition-colors" />
-              <span className="text-[9px] md:text-xs font-medium text-white/60 leading-none">{c.title}</span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-black/40 px-2 py-0.5 rounded-full border border-white/5">
-              <div className="relative flex h-1 w-1">
-                {c.color !== '#0a84ff' && (
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: c.color }} />
-                )}
-                <span className="relative inline-flex rounded-full h-1 w-1" style={{ backgroundColor: c.color }} />
+            <MiniSparkline color={c.color} data={c.history} />
+
+            <div className="flex justify-between items-start relative z-10">
+              <div className="flex items-center gap-1.5">
+                <c.icon size={7} className="text-white/60 transition-colors" />
+                <span className="text-xs font-medium text-white/60">{c.title}</span>
+              </div>
+
+              <div className="flex items-center gap-1.5 bg-black/40 px-2 py-0.5 rounded-full border border-white/5">
+                <div className="relative flex h-1 w-1">
+                  {c.color !== '#0a84ff' && (
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: c.color }}></span>
+                  )}
+                  <span className="relative inline-flex rounded-full h-1 w-1" style={{ backgroundColor: c.color }}></span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className={`flex items-baseline gap-1.5 md:gap-2 ${i === 0 ? 'mt-2 md:mt-2.5' : 'mt-1'} relative z-10`}>
-            <h3 className={`font-sans tracking-tight text-white ${i === 0 ? 'text-2xl md:text-3xl font-light' : 'text-lg md:text-xl font-light'}`}>
-              <AnimatedNumber value={c.value} />
-            </h3>
-            {c.trend && c.trend !== 'stable' && c.trend !== 'optimal' && (
-              <div className={`flex items-center text-[8px] font-mono font-bold px-1 rounded ${(c as any).isNeutralTrend ? 'text-white/60 bg-white/5' : c.trend.startsWith('+') ? 'text-red-400 bg-red-500/10' : 'text-green-400 bg-green-500/10'}`}>
-                {c.trend.startsWith('+') ? <ArrowUpRight size={6.5} /> : <ArrowDownRight size={6.5} />}
-                {c.trend.replace(/^[+-]/, '')}
-              </div>
-            )}
-          </div>
+            <div className={`flex items-baseline gap-2 ${i === 0 ? 'mt-2.5' : 'mt-1.5'} relative z-10`}>
+              <h3 className={`font-sans tracking-tight text-white ${i === 0 ? 'text-4xl font-light' : 'text-xl font-light'}`}>
+                <AnimatedNumber value={c.value} />
+              </h3>
 
-          <div className="mt-auto pt-1.5 md:pt-2.5 relative z-10">
-            <p className="text-[8px] md:text-[9px] font-medium text-white/50 border-t border-white/[0.08] pt-1 md:pt-1.5">{c.subtext}</p>
+              {c.trend && c.trend !== 'stable' && c.trend !== 'optimal' && (
+                <div className={`flex items-center text-[8px] font-mono font-bold px-1 rounded ${(c as any).isNeutralTrend ? 'text-white/60 bg-white/5' : c.trend.startsWith('+') ? 'text-red-400 bg-red-500/10' : 'text-green-400 bg-green-500/10'
+                  }`}>
+                  {c.trend.startsWith('+') ? <ArrowUpRight size={6.5} /> : <ArrowDownRight size={6.5} />}
+                  {c.trend.replace(/^[+-]/, '')}
+                </div>
+              )}
+            </div>
+
+            <div className="mt-auto pt-2.5 relative z-10">
+              <p className="text-[10px] font-medium text-white/50 border-t border-white/[0.08] pt-1.5">
+                {c.subtext}
+              </p>
+            </div>
           </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 })
