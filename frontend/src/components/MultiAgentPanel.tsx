@@ -43,7 +43,7 @@ export function MultiAgentPanel() {
 
   const executeResolution = async () => {
     setIsResolving(true); setShowOverride(false); window.speechSynthesis?.cancel()
-    try { await fetch('http://localhost:8000/api/demo/resolve', { method: 'POST' }) } catch (e) { console.error(e) }
+    try { await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/demo/resolve`, { method: 'POST' }) } catch (e) { console.error(e) }
   }
 
   const agents = activeIncident ? [

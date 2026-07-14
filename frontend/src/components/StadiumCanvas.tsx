@@ -767,7 +767,7 @@ const OperationsConsole = React.memo(
 
     const triggerIncident = async (type: string) => {
       try {
-        const res = await fetch('http://localhost:8000/api/demo/trigger', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/demo/trigger`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ incident_type: type })
@@ -847,7 +847,7 @@ const OperationsConsole = React.memo(
 
     const resetSimulation = async () => {
       try {
-        await fetch('http://localhost:8000/api/demo/reset', { method: 'POST' })
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/demo/resolve`, { method: 'POST' })
       } catch (e) {
         console.warn("Backend unavailable. Resetting client-side simulation.")
         const store = useZoneStore.getState()

@@ -1,6 +1,8 @@
 fastapi
-uvicorn
+uvicorn[standard]
 websockets
 anthropic
 python-dotenv
 pydantic
+opencv-python
+openai

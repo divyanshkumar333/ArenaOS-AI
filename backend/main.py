@@ -3,6 +3,8 @@ import json
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+import os
+from dotenv import load_dotenv
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel
@@ -17,13 +19,8 @@ app = FastAPI(title="ArenaOS AI Backend")
 app.add_middleware(GZipMiddleware, minimum_size=500)
 
 # Secure CORS: limit allowed origins in production
-ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:3001",
-    "http://127.0.0.1:3001",
-    "http://localhost:8000",
-]
+load_dotenv()
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 
 app.add_middleware(
     CORSMiddleware,
@@ -32,6 +29,11 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
+
+# Health endpoint
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
 
 # Standardized Error Handler to prevent leakage of server details
 @app.exception_handler(Exception)
@@ -171,4 +173,5 @@ async def video_feed():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.getenv("PORT", "8000"))
+    uvicorn.run(app, host="0.0.0.0", port=port)

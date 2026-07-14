@@ -27,7 +27,7 @@ export function Sidebar() {
 
   const triggerIncident = async (type: string) => {
     try {
-      await fetch('http://localhost:8000/api/demo/trigger', {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/demo/trigger`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ incident_type: type })
