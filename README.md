@@ -1,104 +1,89 @@
 # ArenaOS AI
-### The Spatial Intelligence Operating System for Next-Generation Venues
 
-> **A Hackathon Winning Build** — Fusing 3D digital twins, agentic AI swarms, live computer vision, and real-time telemetry into a unified command and control operating system.
-
----
-
-## 1. The Vision
-
-Traditional venue command centers are collections of isolated screens: separate CCTV grids, separate BMS dashboards, and disjointed radio communications. During critical incidents, operators are forced to mentally piece together spatial data, leading to delayed reactions and operational blind spots.
-
-**ArenaOS AI** collapses this complexity. It is an operating system that turns the physical venue into a live, interactive 3D digital twin. By combining computer vision tracking, autonomic response agents, and numbers-driven AI reasoning, ArenaOS AI delivers instant situational awareness.
+## Overview
+**ArenaOS AI** is an **AI‑powered Digital Twin Command Center** that demonstrates how smart venues could be monitored, visualized, and operated using a unified 3‑D interface. The prototype showcases a complete end‑to‑end architecture built on a **production‑inspired stack**.
 
 ---
 
-## 2. Key Capabilities
-
-* 🌐 **Live Interactive 3D Twin:** A lightweight React Three Fiber engine rendering high-fidelity geometry, custom heatmap shaders, and live telemetry overlays.
-* 🤖 **Agentic Copilot & Swarm:** An autonomous swarm dispatch system that deploys reconnaissance drone entities to incident zones with live telemetry feedback.
-* 👁️ **Computer Vision Perception:** OpenCV-powered tracking logs (simulated on-screen) converting physical crowds into structural density heatmaps.
-* 🔊 **Programmatic Cinematic Audio:** Lightweight, zero-latency synthesizer using the browser `AudioContext` to output low sub-bass warning impacts and tactical chimes on alert.
-* 📈 **Continuous Glassmorphic Desktop:** A unified interface designed under Apple, Stripe, and Palantir Gotham design systems, removing visual clutter and panel boundaries.
+## Quick Feature List
+- AI Copilot (scaffold – ready for LLM integration)
+- Live Digital Twin
+- Simulated Computer Vision pipeline (`camera_service.py`)
+- Real‑time telemetry via WebSockets
+- Multi‑Agent UI (dispatch UI in place, logic scaffolded)
+- FastAPI backend
+- React Three Fiber front‑end
+- Incident simulation engine
+- Extensible design for future AI/vision integration
 
 ---
 
-## 3. System Architecture
+## Why ArenaOS AI?
+Venue operators today juggle dozens of disconnected dashboards. When an incident occurs, they lose precious seconds stitching together fragmented data. **ArenaOS AI** collapses that complexity into a single, interactive 3‑D twin that surfaces live telemetry, AI‑driven recommendations, and a unified incident response flow.
 
-```mermaid
-graph TD
-    A[IoT & CCTV Feeds] -->|OpenCV / Vision Analyser| B[Perception Layer]
-    B -->|WebSocket Stream| C[FastAPI Gateway]
-    D[NVIDIA NIM / Llama-3.3] <-->|JSON Inference| C
-    C -->|Real-Time WS Protocol| E[Zustand State Store]
-    E -->|Continuous State Feed| F[R3F 3D Stadium Twin]
-    E -->|AudioContext API| G[Synthesized Sound Alert]
-    E -->|Z-indexed Glass HUD| H[Operator Control Console]
-    H -->|Command Trigger| C
+---
+
+## Technical Stack
+| Layer | Technologies |
+|-------|--------------|
+| Front‑end | Next.js (TypeScript), React Three Fiber, Three.js, Framer Motion, Zustand |
+| Back‑end | Python, FastAPI, WebSockets |
+| AI / ML | Stub for NVIDIA NIM / Llama 3.3 (future integration) |
+| Computer Vision | Simulated pipeline (`camera_service.py`) – real OpenCV integration planned |
+| State Management | Zustand (React) |
+
+---
+
+## Folder Structure
+```
+ArenaOS AI/
+├─ backend/          # Python server, camera_service, ai_agent stub
+│   ├─ main.py
+│   ├─ camera_service.py
+│   └─ ai_agent.py
+├─ frontend/        # Next.js app
+│   └─ src/
+│       ├─ app/
+│       ├─ components/
+│       ├─ hooks/
+│       ├─ store/
+│       └─ types/
+├─ stadium/          # 3D GLB assets, textures
+├─ docs/             # Documentation, diagrams, assets
+└─ README.md
 ```
 
 ---
 
-## 4. Cinematic 3-Minute Demo Script
-
-This script guarantees a high-impact presentation flow for judges:
-
-### **Phase 1: Launch & Normal Operations (0:00 - 0:45)**
-1. Open the landing page. Point out the Stripe-style narrative structure: **The Problem** vs. **The Paradigm**.
-2. Click **Launch Command Center**.
-3. Point out the **Living Stadium**: Notice the breathing LED rings, the drifting seating sparkles (crowd density data), and the rotating security drone.
-4. Call out the layout: The borders have been softened to `white/[0.04]`, letting the dark cloud background bleed into a single workspace.
-
-### **Phase 2: Anomaly Detection (0:45 - 1:30)**
-1. Press `1` on your keyboard (or click **Gate 3** in the Simulator Console).
-2. **Observe the immediate cascade:**
-   * The camera executes a two-stage cinematic swoop: first, zooming out to capture the full stadium scale, then diving down to frame the anomaly.
-   * A heavy sub-bass alert sound sweeps (synthesized programmatically).
-   * The **Heatmap** and **Sensors** layers automatically activate.
-   * The **Recon Drone** flies to the Gate 3 coordinates and projects a pulsing blue scanning spotlight.
-
-### **Phase 3: AI Analysis & Action (1:30 - 2:15)**
-1. Call out the right panel: The Copilot has been replaced by the **Incident HUD**.
-2. Read the explanation: Point out how the AI uses numbers-driven, precise telemetry (e.g., *"Crowd density increased 37% over the last 90 seconds. Turnstile throughput exceeded capacity by 145 people/min"*).
-3. Point to the **Reasoning Engine** progress bars at the bottom right.
-4. Click **Execute** in the Incident Panel.
-
-### **Phase 4: Resolution & Report (2:15 - 3:00)**
-1. The drone returns to its patrol, the alarm resets, and the **System Stabilized** report overlays the screen.
-2. Highlight the key efficiency gains (e.g., 42% average wait time reduction).
-3. Click **Acknowledge** to return the stadium to nominal baseline operations.
+## Roadmap
+1. Wire up live LLM inference (replace `ai_agent.py` stub).
+2. Integrate real OpenCV/RTSP camera feeds.
+3. Polish UI and improve performance.
+4. Add automated tests and CI pipeline.
 
 ---
 
-## 5. Technical Stack
-
-* **Frontend:** Next.js (TypeScript), React Three Fiber, Three.js, Framer Motion, Zustand, Tailwind CSS.
-* **Backend:** Python, FastAPI, WebSockets.
-* **AI Models:** Meta Llama 3.3 70B (via NVIDIA NIM).
+## How to Run Locally
+1. **Start services** – run the provided batch script:
+   ```bash
+   ./start-demo.bat
+   ```
+2. **Backend (manual)**
+   ```bash
+   cd backend
+   python -m venv venv
+   venv\Scripts\activate   # Windows
+   pip install -r requirements.txt
+   python main.py
+   ```
+3. **Frontend**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+   Open http://localhost:3000 to explore the command center.
 
 ---
 
-## 6. How to Run Locally
-
-### **Start Both Services**
-The easiest way is using the configured batch script:
-```bash
-./start-demo.bat
-```
-
-### **Manual Backend Setup**
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # venv\Scripts\activate on Windows
-pip install -r requirements.txt
-python main.py
-```
-
-### **Manual Frontend Setup**
-```bash
-cd frontend
-npm install
-npm run dev
-```
-Open [http://localhost:3000](http://localhost:3000) to view the operating system.
+*ArenaOS AI is a hackathon‑level prototype that demonstrates a **production‑inspired architecture**. It is not a production‑ready deployment, but the codebase is structured for easy extension into a full‑scale system.*

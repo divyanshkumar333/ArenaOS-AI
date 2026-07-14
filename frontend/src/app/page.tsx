@@ -210,7 +210,8 @@ function HeroSection() {
             WebkitTextFillColor: 'transparent',
           }}
         >
-          The Operating System<br />
+          ArenaOS AI
+          <br />
           <span style={{ WebkitTextFillColor: '#fff' }}>for Smart Venues.</span>
         </motion.h1>
 
@@ -221,9 +222,7 @@ function HeroSection() {
           transition={{ duration: 0.75, delay: 0.32, ease: [0.16, 1, 0.3, 1] }}
           className="text-base md:text-lg text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed"
         >
-          ArenaOS AI unifies Digital Twins, Computer Vision, AI copilots, and live telemetry
-          into one intelligent command center — helping operators detect, predict, and resolve
-          incidents before they escalate.
+          ArenaOS AI combines live operational telemetry, spatial visualization, and AI‑assisted incident response into a unified command experience.
         </motion.p>
 
         {/* CTAs */}
@@ -397,10 +396,11 @@ function ProblemSection() {
 function FeaturesSection() {
   const features = [
     { icon: Radar,       title: "Live Digital Twin",     desc: "A physically accurate 3D stadium mapped to real-time sensor telemetry. Every occupancy change, every zone alert, rendered live." },
-    { icon: Bot,         title: "AI Copilot",            desc: "The copilot doesn't guess. It cites specific numbers: crowd density, ingress rate, bottleneck probability, and estimated time to critical." },
-    { icon: Eye,         title: "Computer Vision",       desc: "OpenCV integration tracks crowd flow from CCTV feeds and converts physical density into structured spatial data." },
-    { icon: Activity,    title: "Predictive Analytics",  desc: "Forecast anomalies before they escalate. AI models flag risk zones up to 4 minutes before congestion becomes critical." },
-    { icon: Network,     title: "Autonomous Agents",     desc: "A drone swarm dispatches automatically to incident zones, casting volumetric scanning beams and streaming telemetry." },
+    { icon: Bot,         title: "AI Copilot",            desc: "Analyzes structured incident data and generates operational recommendations. Supports optional LLM integration for advanced contextual reasoning." },
+    { icon: Eye,         title: "Computer Vision Pipeline",       desc: "Supports webcam‑based occupancy estimation today and is architected for future RTSP/IP‑camera integration." },
+    { icon: Activity,    title: "Predictive Analytics Prototype",  desc: "Demonstrates how AI‑driven crowd forecasting can be integrated into the operational workflow." },
+    { icon: Network,     title: "Multi‑Agent UI",          desc: "Visualizes collaborative AI agents responsible for monitoring, analysis, planning, and response. The architecture supports future autonomous orchestration." },
+    { icon: Network,     title: "Drone Dispatch",          desc: "Visualizes coordinated drone deployment as part of the incident response workflow." },
     { icon: ShieldAlert, title: "Incident Response",     desc: "From detection to resolution in seconds. The operator approves — ArenaOS executes, logs, and summarizes the impact." },
   ]
 
