@@ -11,34 +11,34 @@ import { ActivityLog } from '@/components/ActivityLog'
 import { Activity, ShieldAlert, Radar, Bot, Settings, ChevronUp, X } from 'lucide-react'
 import { ArenaLogo } from '@/components/ArenaLogo'
 
+// BottomSheet component moved out of render to avoid static component creation warnings
+const BottomSheet = ({ title, id, activeSheet, setActiveSheet, children }: { title: string, id: string, activeSheet: string | null, setActiveSheet: (s: string | null) => void, children: React.ReactNode }) => (
+  <AnimatePresence>
+    {activeSheet === id && (
+      <motion.div
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+        className="fixed inset-0 z-50 flex flex-col bg-black/90 backdrop-blur-xl pb-20 h-[80vh]"
+      >
+        <div className="flex items-center justify-between p-4 border-b border-white/[0.08] shrink-0 bg-black/50">
+          <h2 className="text-sm font-bold text-white tracking-widest uppercase">{title}</h2>
+          <button onClick={() => setActiveSheet(null)} className="p-2 bg-white/5 rounded-full text-white/60 hover:text-white">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto min-h-0 p-4">
+          {children}
+        </div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+)
+
 export function MobileDashboard() {
   const activeIncident = useZoneStore(state => state.activeIncident)
   const [activeSheet, setActiveSheet] = useState<string | null>(null)
-
-  // Full-screen Bottom Sheet Component
-  const BottomSheet = ({ title, id, children }: { title: string, id: string, children: React.ReactNode }) => (
-    <AnimatePresence>
-      {activeSheet === id && (
-        <motion.div
-          initial={{ y: '100%' }}
-          animate={{ y: 0 }}
-          exit={{ y: '100%' }}
-          transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-          className="fixed inset-0 z-50 flex flex-col bg-black/90 backdrop-blur-xl pb-20"
-        >
-          <div className="flex items-center justify-between p-4 border-b border-white/[0.08] shrink-0 bg-black/50">
-            <h2 className="text-sm font-bold text-white tracking-widest uppercase">{title}</h2>
-            <button onClick={() => setActiveSheet(null)} className="p-2 bg-white/5 rounded-full text-white/60 hover:text-white">
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-          <div className="flex-1 overflow-y-auto min-h-0 p-4">
-            {children}
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  )
 
   return (
     <div className="relative w-full h-full bg-black flex flex-col overflow-hidden">
@@ -98,11 +98,11 @@ export function MobileDashboard() {
       </div>
 
       {/* Bottom Sheets */}
-      <BottomSheet id="copilot" title={activeIncident ? "Incident Response" : "AI Copilot"}>
+      <BottomSheet id="copilot" activeSheet={activeSheet} setActiveSheet={setActiveSheet} title={activeIncident ? "Incident Response" : "AI Copilot"}>
         {activeIncident ? <IncidentPanel /> : <AICopilot />}
       </BottomSheet>
 
-      <BottomSheet id="telemetry" title="Live Telemetry">
+      <BottomSheet id="telemetry" activeSheet={activeSheet} setActiveSheet={setActiveSheet} title="Live Telemetry">
         <div className="flex flex-col gap-4 h-full">
           <div className="h-1/2 border border-white/[0.04] rounded-xl overflow-hidden bg-black/40"><TelemetryFeed /></div>
           <div className="h-1/2 border border-white/[0.04] rounded-xl overflow-hidden bg-black/40"><ActivityLog /></div>

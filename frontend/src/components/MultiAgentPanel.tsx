@@ -4,7 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle, XCircle, Loader2, BrainCircuit, Eye, Truck, ShieldAlert, Fingerprint } from 'lucide-react'
 
 export function MultiAgentPanel() {
-  const { activeIncident, isMuted, setShowDecisionMatrix } = useZoneStore()
+  const activeIncident = useZoneStore(state => state.activeIncident)
+  const isMuted = useZoneStore(state => state.isMuted)
+  const setShowDecisionMatrix = useZoneStore(state => state.setShowDecisionMatrix)
   const [step, setStep] = useState(0)
   const [showOverride, setShowOverride] = useState(false)
   const [isResolving, setIsResolving] = useState(false)

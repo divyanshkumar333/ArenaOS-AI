@@ -154,6 +154,8 @@ export function DroneEntity({ initialPosition = [0, 100, 0] }: DroneEntityProps)
 
   const currentPos = useRef(new Vector3(...initialPosition));
   const idlePos = React.useMemo(() => new Vector3(), []);
+  const lookTargetRef = React.useRef(new Vector3());
+  const directionOffset = React.useMemo(() => new Vector3(), []);
 
   useFrame((state, delta) => {
     if (!groupRef.current) return;
@@ -172,14 +174,16 @@ export function DroneEntity({ initialPosition = [0, 100, 0] }: DroneEntityProps)
     
     // Rotate to face travel direction
     if (isDispatching) {
-      const lookTarget = targetPos.clone();
-      lookTarget.y = groupRef.current.position.y; // Keep level look
-      groupRef.current.lookAt(lookTarget);
+       const lt = lookTargetRef.current;
+       lt.copy(targetPos);
+       lt.y = groupRef.current.position.y; // Keep level look
+       groupRef.current.lookAt(lt);
     } else {
-      const lookTarget = currentPos.current.clone().add(
-        new Vector3(-Math.sin(state.clock.getElapsedTime() * 0.1), 0, Math.cos(state.clock.getElapsedTime() * 0.1))
-      );
-      groupRef.current.lookAt(lookTarget);
+       const t = state.clock.getElapsedTime();
+       directionOffset.set(-Math.sin(t * 0.1), 0, Math.cos(t * 0.1));
+       const lt = lookTargetRef.current;
+       lt.copy(currentPos.current).add(directionOffset);
+       groupRef.current.lookAt(lt);
     }
   });
 

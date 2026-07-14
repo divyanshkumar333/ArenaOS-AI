@@ -6,7 +6,9 @@ import { GitBranch, Check, Zap, Clock, ShieldAlert, Users, Loader2 } from "lucid
 import { useState } from "react"
 
 export function ScenarioComparison() {
-  const { showDecisionMatrix, setShowDecisionMatrix, activeIncident } = useZoneStore()
+  const showDecisionMatrix = useZoneStore(state => state.showDecisionMatrix)
+  const setShowDecisionMatrix = useZoneStore(state => state.setShowDecisionMatrix)
+  const activeIncident = useZoneStore(state => state.activeIncident)
   const [isResolving, setIsResolving] = useState(false)
   const setShowImpactReport = useZoneStore(state => state.setShowImpactReport)
   

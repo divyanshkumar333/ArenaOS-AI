@@ -307,8 +307,9 @@ const LightPillar = ({
       geometryRef.current = null;
       rafRef.current = null;
     };
-  }, [webGLSupported, quality]);
+  }, [webGLSupported, quality, bottomColor, glowAmount, intensity, interactive, noiseIntensity, pillarHeight, pillarRotation, pillarWidth, topColor]);
 
+  // eslint-disable-next-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     rotationSpeedRef.current = rotationSpeed;
   }, [rotationSpeed]);

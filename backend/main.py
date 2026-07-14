@@ -1,8 +1,10 @@
 import asyncio
 import json
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
+from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel
 
 from simulation import SimulationEngine
@@ -11,13 +13,40 @@ from camera_service import camera_service
 
 app = FastAPI(title="ArenaOS AI Backend")
 
+# Response Compression
+app.add_middleware(GZipMiddleware, minimum_size=500)
+
+# Secure CORS: limit allowed origins in production
+ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
+    "http://localhost:8000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
+
+# Standardized Error Handler to prevent leakage of server details
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An internal operational error occurred. The incident response team has been alerted."}
+    )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={"detail": "Invalid parameters submitted to the ArenaOS Command Center."}
+    )
 
 engine = SimulationEngine()
 
@@ -28,18 +57,23 @@ class ConnectionManager:
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
         self.active_connections.append(websocket)
-        # Send initial state immediately upon connection
-        await websocket.send_json(engine.get_state())
+        try:
+            # Send initial state immediately upon connection
+            await websocket.send_json(engine.get_state())
+        except Exception:
+            self.disconnect(websocket)
 
     def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
+        if websocket in self.active_connections:
+            self.active_connections.remove(websocket)
 
     async def broadcast_json(self, message: dict):
-        for connection in self.active_connections:
+        # Prevent runtime modification errors by copying active connection list
+        for connection in list(self.active_connections):
             try:
                 await connection.send_json(message)
             except Exception:
-                pass
+                self.disconnect(connection)
 
 manager = ConnectionManager()
 
@@ -117,7 +151,7 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             # We don't expect messages from client, but we need to keep connection open
             await websocket.receive_text()
-    except WebSocketDisconnect:
+    except (WebSocketDisconnect, Exception):
         manager.disconnect(websocket)
 
 def generate_frames():
