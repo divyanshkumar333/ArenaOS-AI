@@ -14,12 +14,20 @@
   --font-mono: 'JetBrains Mono', SFMono-Regular, ui-monospace, monospace;
 }
 
-body {
+html, body {
   background-color: var(--color-background);
   color: var(--color-text-primary);
   font-family: var(--font-sans);
   margin: 0;
   padding: 0;
+  /* Prevent horizontal scroll on all screen sizes */
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Safe-area bottom padding utility for notched phones */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Custom scrollbar for tight layout */

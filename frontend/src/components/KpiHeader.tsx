@@ -60,8 +60,8 @@ export function KpiHeader() {
         </div>
       </Link>
 
-      {/* Center Operation Mode & Clock */}
-      <div className="flex items-center space-x-6">
+      {/* Center Operation Mode & Clock — hidden on mobile */}
+      <div className="hidden md:flex items-center space-x-6">
         {/* Operation Mode Badge */}
         <div className="flex items-center space-x-2 bg-white/5 border border-white/[0.08] px-3 py-1.5 rounded-full">
           <span className="text-[9px] font-medium text-white/60 uppercase tracking-widest">Operation Mode</span>
@@ -79,8 +79,8 @@ export function KpiHeader() {
         </div>
       </div>
       
-      {/* Right side Stats */}
-      <div className="flex items-center space-x-6 text-[12px] text-white/60">
+      {/* Right side Stats — hidden on mobile */}
+      <div className="hidden md:flex items-center space-x-6 text-[12px] text-white/60">
         
         <div className="flex flex-col items-end">
           <span className="text-[10px]">Avg Occupancy</span>

@@ -8,51 +8,79 @@ import { IncidentPanel } from '@/components/IncidentPanel'
 import { AICopilot } from '@/components/AICopilot'
 import { TelemetryFeed } from '@/components/TelemetryFeed'
 import { ActivityLog } from '@/components/ActivityLog'
-import { Activity, ShieldAlert, Radar, Bot, Settings, ChevronUp, X } from 'lucide-react'
+import { Sidebar } from '@/components/Sidebar'
+import { Activity, Radar, Bot, Menu, X } from 'lucide-react'
 import { ArenaLogo } from '@/components/ArenaLogo'
 
-// BottomSheet component moved out of render to avoid static component creation warnings
-const BottomSheet = ({ title, id, activeSheet, setActiveSheet, children }: { title: string, id: string, activeSheet: string | null, setActiveSheet: (s: string | null) => void, children: React.ReactNode }) => (
+// BottomSheet slides up from the bottom covering 85% of the screen.
+// Using top-[15%] instead of fixed inset-0 + h-[80vh] so height is always correct.
+const BottomSheet = ({
+  title,
+  id,
+  activeSheet,
+  setActiveSheet,
+  children,
+}: {
+  title: string
+  id: string
+  activeSheet: string | null
+  setActiveSheet: (s: string | null) => void
+  children: React.ReactNode
+}) => (
   <AnimatePresence>
     {activeSheet === id && (
       <motion.div
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
-        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="fixed inset-0 z-50 flex flex-col bg-black/90 backdrop-blur-xl pb-20 h-[80vh]"
+        transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+        className="fixed inset-x-0 bottom-0 top-[12%] z-50 flex flex-col bg-black/95 backdrop-blur-xl"
+        style={{ touchAction: 'pan-y' }}
       >
-        <div className="flex items-center justify-between p-4 border-b border-white/[0.08] shrink-0 bg-black/50">
+        {/* Handle bar */}
+        <div className="flex justify-center pt-2 pb-1 shrink-0">
+          <div className="w-10 h-1 rounded-full bg-white/20" />
+        </div>
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08] shrink-0">
           <h2 className="text-sm font-bold text-white tracking-widest uppercase">{title}</h2>
-          <button onClick={() => setActiveSheet(null)} className="p-2 bg-white/5 rounded-full text-white/60 hover:text-white">
+          <button
+            onClick={() => setActiveSheet(null)}
+            className="p-2 bg-white/5 rounded-full text-white/60 active:text-white"
+            aria-label="Close panel"
+          >
             <X className="w-4 h-4" />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto min-h-0 p-4">
-          {children}
-        </div>
+
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto min-h-0 p-4 pb-24">{children}</div>
       </motion.div>
     )}
   </AnimatePresence>
 )
 
 export function MobileDashboard() {
-  const activeIncident = useZoneStore(state => state.activeIncident)
+  const activeIncident = useZoneStore((state) => state.activeIncident)
   const [activeSheet, setActiveSheet] = useState<string | null>(null)
 
   return (
     <div className="relative w-full h-full bg-black flex flex-col overflow-hidden">
-      
+
       {/* Mobile Top Bar */}
-      <div className="absolute top-0 left-0 w-full z-40 p-4 flex items-center justify-between pointer-events-none">
-        <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-full pointer-events-auto">
+      <div className="absolute top-0 left-0 w-full z-40 px-4 py-3 flex items-center justify-between pointer-events-none">
+        <div className="flex items-center gap-2 bg-black/50 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-full pointer-events-auto">
           <ArenaLogo size={16} className="text-accent" animate />
-          <span className="font-bold text-xs tracking-widest text-white">ARENA<span className="text-accent">OS</span></span>
+          <span className="font-bold text-xs tracking-widest text-white">
+            ARENA<span className="text-accent">OS</span>
+          </span>
         </div>
-        
+
         {activeIncident && (
-          <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
             className="bg-red-500/20 border border-red-500/40 text-red-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest pointer-events-auto flex items-center gap-1"
           >
             <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
@@ -61,54 +89,114 @@ export function MobileDashboard() {
         )}
       </div>
 
-      {/* Main 3D Canvas (Full Screen) */}
+      {/* Full-screen 3D Canvas */}
       <div className="absolute inset-0 z-0">
         <BootSequenceOverlay />
         <StadiumCanvas />
       </div>
 
-      {/* Floating Swipeable KPIs */}
-      <div className="absolute top-16 left-0 w-full z-30 pointer-events-auto overflow-x-auto snap-x snap-mandatory scrollbar-none px-4 pb-4">
+      {/* Horizontally scrollable KPI strip */}
+      <div className="absolute top-14 left-0 w-full z-30 pointer-events-auto overflow-x-auto snap-x snap-mandatory px-4 pb-2"
+        style={{ scrollbarWidth: 'none' }}>
         <div className="flex gap-3 w-max">
           <KPICards />
         </div>
       </div>
 
       {/* Bottom Navigation Bar */}
-      <div className="absolute bottom-0 left-0 w-full z-40 bg-black/80 backdrop-blur-xl border-t border-white/[0.08] pb-safe px-2 py-2 flex justify-around items-center">
-        
-        <button onClick={() => setActiveSheet(null)} className={`flex flex-col items-center gap-1 p-2 transition-colors ${!activeSheet ? 'text-accent' : 'text-gray-500'}`}>
+      <nav
+        className="absolute bottom-0 left-0 w-full z-40 bg-black/85 backdrop-blur-xl border-t border-white/[0.08] pb-safe px-2 pt-2 flex justify-around items-center"
+        aria-label="Mobile navigation"
+      >
+        {/* Digital Twin */}
+        <button
+          onClick={() => setActiveSheet(null)}
+          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors ${
+            !activeSheet ? 'text-accent bg-accent/10' : 'text-gray-500'
+          }`}
+          aria-label="Digital Twin view"
+        >
           <Radar className="w-5 h-5" />
           <span className="text-[9px] uppercase tracking-wider font-mono">Twin</span>
         </button>
 
-        <button onClick={() => setActiveSheet('copilot')} className={`flex flex-col items-center gap-1 p-2 transition-colors ${activeSheet === 'copilot' ? 'text-accent' : 'text-gray-500'}`}>
+        {/* AI Copilot */}
+        <button
+          onClick={() => setActiveSheet('copilot')}
+          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors ${
+            activeSheet === 'copilot' ? 'text-accent bg-accent/10' : 'text-gray-500'
+          }`}
+          aria-label="AI Copilot"
+        >
           <div className="relative">
             <Bot className="w-5 h-5" />
-            {activeIncident && <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />}
+            {activeIncident && (
+              <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+            )}
           </div>
           <span className="text-[9px] uppercase tracking-wider font-mono">Copilot</span>
         </button>
 
-        <button onClick={() => setActiveSheet('telemetry')} className={`flex flex-col items-center gap-1 p-2 transition-colors ${activeSheet === 'telemetry' ? 'text-accent' : 'text-gray-500'}`}>
+        {/* Live Telemetry */}
+        <button
+          onClick={() => setActiveSheet('telemetry')}
+          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors ${
+            activeSheet === 'telemetry' ? 'text-accent bg-accent/10' : 'text-gray-500'
+          }`}
+          aria-label="Live telemetry"
+        >
           <Activity className="w-5 h-5" />
           <span className="text-[9px] uppercase tracking-wider font-mono">Sensors</span>
         </button>
 
-      </div>
+        {/* Sidebar / Menu */}
+        <button
+          onClick={() => setActiveSheet('menu')}
+          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors ${
+            activeSheet === 'menu' ? 'text-accent bg-accent/10' : 'text-gray-500'
+          }`}
+          aria-label="Navigation menu"
+        >
+          <Menu className="w-5 h-5" />
+          <span className="text-[9px] uppercase tracking-wider font-mono">Menu</span>
+        </button>
+      </nav>
 
       {/* Bottom Sheets */}
-      <BottomSheet id="copilot" activeSheet={activeSheet} setActiveSheet={setActiveSheet} title={activeIncident ? "Incident Response" : "AI Copilot"}>
+      <BottomSheet
+        id="copilot"
+        activeSheet={activeSheet}
+        setActiveSheet={setActiveSheet}
+        title={activeIncident ? 'Incident Response' : 'AI Copilot'}
+      >
         {activeIncident ? <IncidentPanel /> : <AICopilot />}
       </BottomSheet>
 
-      <BottomSheet id="telemetry" activeSheet={activeSheet} setActiveSheet={setActiveSheet} title="Live Telemetry">
-        <div className="flex flex-col gap-4 h-full">
-          <div className="h-1/2 border border-white/[0.04] rounded-xl overflow-hidden bg-black/40"><TelemetryFeed /></div>
-          <div className="h-1/2 border border-white/[0.04] rounded-xl overflow-hidden bg-black/40"><ActivityLog /></div>
+      <BottomSheet
+        id="telemetry"
+        activeSheet={activeSheet}
+        setActiveSheet={setActiveSheet}
+        title="Live Telemetry"
+      >
+        <div className="flex flex-col gap-4">
+          <div className="h-64 border border-white/[0.04] rounded-xl overflow-hidden bg-black/40">
+            <TelemetryFeed />
+          </div>
+          <div className="h-64 border border-white/[0.04] rounded-xl overflow-hidden bg-black/40">
+            <ActivityLog />
+          </div>
         </div>
       </BottomSheet>
 
+      {/* Sidebar navigation as a bottom sheet */}
+      <BottomSheet
+        id="menu"
+        activeSheet={activeSheet}
+        setActiveSheet={setActiveSheet}
+        title="Command Center"
+      >
+        <Sidebar />
+      </BottomSheet>
     </div>
   )
 }

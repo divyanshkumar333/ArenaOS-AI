@@ -11,17 +11,17 @@ export function InfrastructureWorkspace() {
   const activeTab = useZoneStore(state => state.activeTab)
 
   return (
-    <div className="flex-1 h-full flex gap-4 min-h-0 overflow-hidden">
+    <div className="flex-1 h-full flex flex-col md:flex-row gap-4 min-h-0 overflow-y-auto md:overflow-hidden">
       
       {/* CENTER AREA: Infrastructure Grid (CCTV / BMS) */}
-      <div className="flex-1 border border-white/5 rounded-xl bg-black overflow-hidden shadow-2xl relative min-h-0">
+      <div className="flex-1 border border-white/5 rounded-xl bg-black overflow-hidden shadow-2xl relative min-h-0 min-h-[320px] md:min-h-0">
         {activeTab === 'CCTV & Surveillance' && <CctvPanel />}
         {activeTab === 'Facility Systems (BMS)' && <BmsPanel />}
         {activeTab === 'Platform Settings' && <PlatformSettings />}
       </div>
 
       {/* RIGHT AREA: AI Analysis Sidecar */}
-      <div className="w-[360px] h-full shrink-0 flex flex-col min-h-0 shadow-2xl">
+      <div className="w-full md:w-[360px] h-64 md:h-full shrink-0 flex flex-col min-h-0 shadow-2xl">
         <AiAnalysisPanel />
       </div>
 
