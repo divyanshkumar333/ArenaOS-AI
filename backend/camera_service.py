@@ -1,4 +1,9 @@
-import cv2
+try:
+    import cv2
+except ImportError as e:
+    cv2 = None
+    import warnings
+    warnings.warn("OpenCV not available; camera service disabled.")
 import threading
 import time
 
@@ -13,7 +18,13 @@ class CameraService:
 
     def start(self):
         if not self.is_running:
-            self.cap = cv2.VideoCapture(0)
+            if cv2 is None:
+            # No OpenCV support; skip webcam initialization
+            self.is_running = False
+            import warnings
+            warnings.warn("Camera service disabled due to missing OpenCV.")
+            return
+        self.cap = cv2.VideoCapture(0)
             self.is_running = True
             threading.Thread(target=self._update_loop, daemon=True).start()
 
