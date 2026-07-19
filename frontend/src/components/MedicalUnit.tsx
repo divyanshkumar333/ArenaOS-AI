@@ -1,6 +1,6 @@
 import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Vector3, Group, Mesh, MathUtils, AdditiveBlending, DoubleSide } from 'three';
+import { Vector3, Group, Mesh, MathUtils, AdditiveBlending, DoubleSide, Material } from 'three';
 import { Html } from '@react-three/drei';
 import { useZoneStore } from '@/store/useZoneStore';
 
@@ -53,8 +53,8 @@ function MedicalDroneModel({ isDispatching, activeZoneId }: { isDispatching: boo
     if (isDispatching) {
       if (sirenRedRef.current && sirenBlueRef.current) {
         const strobe = Math.sin(t * 20);
-        sirenRedRef.current.material.opacity = strobe > 0 ? 0.9 : 0.1;
-        sirenBlueRef.current.material.opacity = strobe < 0 ? 0.9 : 0.1;
+        (sirenRedRef.current.material as Material).opacity = strobe > 0 ? 0.9 : 0.1;
+        (sirenBlueRef.current.material as Material).opacity = strobe < 0 ? 0.9 : 0.1;
       }
       
       // Spin thruster cores
@@ -72,15 +72,15 @@ function MedicalDroneModel({ isDispatching, activeZoneId }: { isDispatching: boo
       // Pulsing healing ring when dispatched
       if (healingRingRef.current) {
         healingRingRef.current.scale.setScalar(1 + (t * 2) % 3);
-        healingRingRef.current.material.opacity = Math.max(0, 1 - ((t * 2) % 3) / 3) * 0.6;
+        (healingRingRef.current.material as Material).opacity = Math.max(0, 1 - ((t * 2) % 3) / 3) * 0.6;
       }
     } else {
       if (sirenRedRef.current && sirenBlueRef.current) {
-        sirenRedRef.current.material.opacity = 0.1;
-        sirenBlueRef.current.material.opacity = 0.1;
+        (sirenRedRef.current.material as Material).opacity = 0.1;
+        (sirenBlueRef.current.material as Material).opacity = 0.1;
       }
       if (healingRingRef.current) {
-        healingRingRef.current.material.opacity = 0;
+        (healingRingRef.current.material as Material).opacity = 0;
       }
       if (thrustersRef.current) {
         thrustersRef.current.children.forEach(thruster => {
@@ -189,7 +189,7 @@ function TraumaScene() {
     if (pulseRef.current) {
       const t = state.clock.getElapsedTime();
       pulseRef.current.scale.setScalar(1 + (t*3)%2);
-      pulseRef.current.material.opacity = Math.max(0, 1 - ((t*3)%2)/2) * 0.8;
+      (pulseRef.current.material as Material).opacity = Math.max(0, 1 - ((t*3)%2)/2) * 0.8;
     }
   });
 
@@ -234,8 +234,8 @@ function MedicalAmbulanceModel({ isDispatching, activeZoneId }: { isDispatching:
     if (isDispatching) {
       if (sirenRedRef.current && sirenBlueRef.current) {
         const strobe = Math.sin(t * 20);
-        sirenRedRef.current.material.opacity = strobe > 0 ? 0.9 : 0.1;
-        sirenBlueRef.current.material.opacity = strobe < 0 ? 0.9 : 0.1;
+        (sirenRedRef.current.material as Material).opacity = strobe > 0 ? 0.9 : 0.1;
+        (sirenBlueRef.current.material as Material).opacity = strobe < 0 ? 0.9 : 0.1;
       }
       
       if (wheelsRef.current) {
@@ -246,15 +246,15 @@ function MedicalAmbulanceModel({ isDispatching, activeZoneId }: { isDispatching:
 
       if (healingRingRef.current) {
         healingRingRef.current.scale.setScalar(1 + (t * 2) % 3);
-        healingRingRef.current.material.opacity = Math.max(0, 1 - ((t * 2) % 3) / 3) * 0.6;
+        (healingRingRef.current.material as Material).opacity = Math.max(0, 1 - ((t * 2) % 3) / 3) * 0.6;
       }
     } else {
       if (sirenRedRef.current && sirenBlueRef.current) {
-        sirenRedRef.current.material.opacity = 0.1;
-        sirenBlueRef.current.material.opacity = 0.1;
+        (sirenRedRef.current.material as Material).opacity = 0.1;
+        (sirenBlueRef.current.material as Material).opacity = 0.1;
       }
       if (healingRingRef.current) {
-        healingRingRef.current.material.opacity = 0;
+        (healingRingRef.current.material as Material).opacity = 0;
       }
     }
   });

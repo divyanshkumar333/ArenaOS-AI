@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Vector3, Group, Mesh, MathUtils, AdditiveBlending, DoubleSide, Object3D, InstancedMesh } from 'three';
+import { Vector3, Group, Mesh, MathUtils, AdditiveBlending, DoubleSide, Object3D, InstancedMesh, Material } from 'three';
 import { Html } from '@react-three/drei';
 import { useZoneStore } from '@/store/useZoneStore';
 import { ZONE_POSITIONS } from '@/components/MedicalUnit';
@@ -22,8 +22,8 @@ function CommandVehicle({ isDispatching }: { isDispatching: boolean }) {
       const strobe = Math.sin(t * (isDispatching ? 25 : 5));
       const r = lightbarRef.current.children[0] as Mesh;
       const b = lightbarRef.current.children[1] as Mesh;
-      r.material.opacity = strobe > 0 ? 1.0 : 0.1;
-      b.material.opacity = strobe < 0 ? 1.0 : 0.1;
+      (r.material as Material).opacity = strobe > 0 ? 1.0 : 0.1;
+      (b.material as Material).opacity = strobe < 0 ? 1.0 : 0.1;
     }
   });
 

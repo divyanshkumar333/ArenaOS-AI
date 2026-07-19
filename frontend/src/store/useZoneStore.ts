@@ -162,7 +162,7 @@ interface ZoneState {
   _demoTimer: NodeJS.Timeout | null
   runDemo: () => void
   pauseDemo: () => void
-  resumeDemo: () => void
+  resumeDemo: (isInitialStart?: boolean) => void
   stopDemo: () => void
   skipScene: () => void
 

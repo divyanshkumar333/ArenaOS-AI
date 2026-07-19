@@ -31,7 +31,7 @@ export function DemoControlsPanel() {
           <Pause className="w-3.5 h-3.5" />
         </button>
       ) : (
-        <button onClick={resumeDemo} className="p-1.5 rounded hover:bg-white/10 text-white transition-colors" title="Resume Demo">
+        <button onClick={() => resumeDemo()} className="p-1.5 rounded hover:bg-white/10 text-white transition-colors" title="Resume Demo">
           <Play className="w-3.5 h-3.5" />
         </button>
       )}
