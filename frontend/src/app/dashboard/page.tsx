@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { KpiHeader } from '@/components/KpiHeader'
 import { Sidebar } from '@/components/Sidebar'
 import { useZoneStore } from '@/store/useZoneStore'
@@ -12,6 +12,7 @@ import { BootSequence } from '@/components/BootSequence'
 import { ExecutiveSummary } from '@/components/ExecutiveSummary'
 import { DemoControlsPanel } from '@/components/DemoControlsPanel'
 import dynamic from 'next/dynamic'
+import { Menu, X } from 'lucide-react'
 
 import { MobileDashboard } from '@/components/workspaces/MobileDashboard'
 import { useIsMobile } from '@/hooks/useMediaQuery'
@@ -31,6 +32,7 @@ export default function DashboardOS() {
   const demoMode = useZoneStore(s => s.demoMode)
   const demoStage = useZoneStore(s => s.demoStage)
   const isMobile = useIsMobile()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     let ws: WebSocket, t: NodeJS.Timeout
@@ -77,7 +79,6 @@ export default function DashboardOS() {
         <BootSequence />
         <ExecutiveSummary />
 
-        
         {/* Top Header */}
         <div className={`shrink-0 pointer-events-auto z-20 transition-opacity duration-700 ${isRecordingMode && demoMode ? 'opacity-0' : 'opacity-100'}`}>
           <KpiHeader />
@@ -86,8 +87,16 @@ export default function DashboardOS() {
         {/* Main Interface Grid */}
         <div className={`flex-1 flex min-h-0 relative py-6 pr-6 pl-2 gap-6 overflow-hidden z-10 transition-opacity duration-700 ${isRecordingMode && demoMode ? 'opacity-0' : 'opacity-100'}`}>
           
+          {/* Mobile/Tablet Sidebar Toggle Button */}
+          <button 
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="lg:hidden absolute top-6 left-4 z-50 p-2 bg-black/60 backdrop-blur-md border border-white/10 rounded-lg pointer-events-auto text-white shadow-xl"
+          >
+            {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+
           {/* Floating Left Sidebar */}
-          <div className="w-[220px] h-full overflow-hidden flex flex-col min-w-0 pointer-events-auto shrink-0 shadow-2xl rounded-[26px]">
+          <div className={`absolute lg:relative z-40 lg:z-auto left-4 lg:left-0 transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-[120%] lg:translate-x-0'} w-[220px] h-full overflow-hidden flex flex-col min-w-0 pointer-events-auto shrink-0 shadow-2xl rounded-[26px]`}>
             <Sidebar />
           </div>
           

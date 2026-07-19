@@ -928,7 +928,7 @@ export function StadiumCanvas() {
         </div>
       </div>
       {!isMobile && (
-        <div className="absolute top-24 right-[400px] z-[80] flex flex-col items-end gap-2 pointer-events-auto">
+        <div className="absolute top-24 right-6 lg:right-[380px] xl:right-[400px] z-[80] flex flex-col items-end gap-2 pointer-events-auto">
           <div className="flex gap-2">
             {/* AI Predictions Toggle Button */}
             <button
@@ -1007,13 +1007,13 @@ export function StadiumCanvas() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="absolute top-24 left-1/2 -translate-x-1/2 z-[90] w-[600px] bg-[rgba(28,28,30,0.62)] backdrop-blur-xl border border-white/[0.08] rounded-xl p-6 shadow-2xl flex flex-col gap-4 text-gray-300 pointer-events-auto"
+            className="absolute top-24 left-1/2 -translate-x-1/2 z-[90] w-[90%] md:w-[600px] bg-[rgba(28,28,30,0.62)] backdrop-blur-xl border border-white/[0.08] rounded-xl p-6 shadow-2xl flex flex-col gap-4 text-gray-300 pointer-events-auto"
           >
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <h2 className="text-lg font-bold text-white flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-accent" /> Scenario Library</h2>
               <button onClick={() => setActiveView('3D Twin')} className="text-gray-500 hover:text-white"><XCircle className="w-4 h-4" /></button>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-black/40 border border-white/5 p-4 rounded-lg hover:border-accent/50 cursor-pointer transition-colors">
                 <h3 className="font-bold text-white text-sm mb-1">Evacuation Protocol Alpha</h3>
                 <p className="text-xs text-gray-400">Standard tier 1 egress strategy for minor anomalies.</p>
@@ -1039,7 +1039,7 @@ export function StadiumCanvas() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="absolute top-24 left-1/2 -translate-x-1/2 z-[90] w-[800px] h-[500px] bg-[rgba(28,28,30,0.62)] backdrop-blur-xl border border-white/[0.08] rounded-xl p-6 shadow-2xl flex flex-col gap-4 text-gray-300 pointer-events-auto"
+            className="absolute top-24 left-1/2 -translate-x-1/2 z-[90] w-[90%] md:w-[800px] h-[500px] bg-[rgba(28,28,30,0.62)] backdrop-blur-xl border border-white/[0.08] rounded-xl p-6 shadow-2xl flex flex-col gap-4 text-gray-300 pointer-events-auto"
           >
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <h2 className="text-lg font-bold text-white flex items-center gap-2"><BarChart3 className="w-4 h-4 text-blue-400" /> System Analytics</h2>
@@ -1056,7 +1056,7 @@ export function StadiumCanvas() {
 
       {/* Operations Console HUD Overlay */}
       {!isMobile && (
-        <div className="absolute bottom-2 left-[632px] right-[408px] z-[80] pointer-events-none flex flex-col items-center gap-5">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[80] pointer-events-none flex flex-col items-center gap-5 w-full max-w-[500px] md:max-w-xl lg:max-w-2xl px-4">
           <TimeMachineScrubber />
           <OperationsConsole activeView={activeView} setActiveView={setActiveView} />
         </div>

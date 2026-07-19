@@ -124,26 +124,25 @@ export function MobileDashboard() {
 
       {/* Bottom Navigation Bar */}
       <nav
-        className="absolute bottom-0 left-0 w-full z-40 bg-black/85 backdrop-blur-xl border-t border-white/[0.08] pb-safe px-2 pt-2 flex justify-around items-center"
+        className="absolute bottom-0 left-0 w-full z-40 bg-black/85 backdrop-blur-xl border-t border-white/[0.08] pb-safe px-2 pt-2 pb-2 flex justify-around items-center"
         aria-label="Mobile navigation"
       >
         {/* Digital Twin */}
         <button
           onClick={() => setActiveSheet(null)}
-          className={`w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-all duration-200 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${!activeSheet ? 'bg-accent/10 text-accent border border-accent/25 font-semibold' : 'text-white/60 hover:bg-white/5 hover:text-white border border-transparent'}`}
+          className={`w-full flex items-center justify-center space-x-2.5 px-3 py-3 min-h-[48px] rounded-lg transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${!activeSheet ? 'bg-accent/10 text-accent border border-accent/25 font-semibold' : 'text-white/60 hover:bg-white/5 hover:text-white border border-transparent'}`}
           aria-label="Digital Twin view"
         >
           <div className={`radar-sweep ${gate3Occupancy > 80 ? 'gate-marker-pulse' : ''}`}>
             <Signal className="w-5 h-5" />
           </div>
-          <span className="text-[9px] uppercase tracking-wider font-mono">Twin</span>
+          <span className="text-[10px] uppercase tracking-wider font-mono">Twin</span>
         </button>
 
         {/* AI Copilot */}
         <button
           onClick={() => setActiveSheet('copilot')}
-          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors ${activeSheet === 'copilot' ? 'text-accent bg-accent/10' : 'text-gray-500'
-            }`}
+          className={`flex flex-col items-center justify-center gap-1 px-4 py-2 min-h-[48px] min-w-[48px] rounded-xl transition-colors ${activeSheet === 'copilot' ? 'text-accent bg-accent/10' : 'text-gray-500'}`}
           aria-label="AI Copilot"
         >
           <div className="relative">
@@ -152,29 +151,27 @@ export function MobileDashboard() {
               <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
             )}
           </div>
-          <span className="text-[9px] uppercase tracking-wider font-mono">Copilot</span>
+          <span className="text-[10px] uppercase tracking-wider font-mono">Copilot</span>
         </button>
 
         {/* Live Telemetry */}
         <button
           onClick={() => setActiveSheet('telemetry')}
-          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors ${activeSheet === 'telemetry' ? 'text-accent bg-accent/10' : 'text-gray-500'
-            }`}
+          className={`flex flex-col items-center justify-center gap-1 px-4 py-2 min-h-[48px] min-w-[48px] rounded-xl transition-colors ${activeSheet === 'telemetry' ? 'text-accent bg-accent/10' : 'text-gray-500'}`}
           aria-label="Live telemetry"
         >
           <Wifi className="w-5 h-5" />
-          <span className="text-[9px] uppercase tracking-wider font-mono">Sensors</span>
+          <span className="text-[10px] uppercase tracking-wider font-mono">Sensors</span>
         </button>
 
         {/* Sidebar / Menu */}
         <button
           onClick={() => setActiveSheet('menu')}
-          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors ${activeSheet === 'menu' ? 'text-accent bg-accent/10' : 'text-gray-500'
-            }`}
+          className={`flex flex-col items-center justify-center gap-1 px-4 py-2 min-h-[48px] min-w-[48px] rounded-xl transition-colors ${activeSheet === 'menu' ? 'text-accent bg-accent/10' : 'text-gray-500'}`}
           aria-label="Navigation menu"
         >
           <Menu className="w-5 h-5" />
-          <span className="text-[9px] uppercase tracking-wider font-mono">Menu</span>
+          <span className="text-[10px] uppercase tracking-wider font-mono">Menu</span>
         </button>
       </nav>
 

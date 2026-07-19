@@ -168,7 +168,7 @@ function HeroSection() {
           </div>
           <span className="font-bold tracking-widest text-base text-white">ARENA<span className="text-accent">OS</span></span>
         </div>
-        <Link href="/dashboard">
+        <Link href="/dashboard" className="p-3 -m-3 flex items-center justify-center min-h-[44px]">
           <motion.span
             whileHover={{ color: '#fff', x: 2 }}
             className="text-xs font-mono text-gray-400 uppercase tracking-widest cursor-pointer transition-colors"
