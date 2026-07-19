@@ -21,7 +21,7 @@ export function BmsPanel() {
   ])
 
   return (
-    <div className="w-full h-full bg-[rgba(18,18,20,0.85)] p-6 flex flex-col font-sans select-none overflow-y-auto no-scrollbar gap-6 backdrop-blur-xl rounded-2xl">
+    <div className="w-full h-full bg-gradient-to-br from-[#121214]/90 to-[rgba(18,18,20,0.75)] p-6 flex flex-col font-sans select-none overflow-y-auto no-scrollbar gap-6 backdrop-blur-3xl shadow-[inset_0_0_30px_rgba(255,255,255,0.015)] border border-white/[0.08] rounded-2xl">
       {/* Panel Header */}
       <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
         <div className="flex items-center gap-2.5">

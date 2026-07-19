@@ -18,4 +18,10 @@
   position: absolute;
   top: 0;
   left: 0;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
 }

@@ -11,7 +11,7 @@ export function InfrastructureWorkspace() {
   const activeTab = useZoneStore(state => state.activeTab)
 
   return (
-    <div className="flex-1 h-full flex flex-col md:flex-row gap-4 min-h-0 overflow-y-auto md:overflow-hidden">
+    <div className="flex-1 h-full flex flex-col md:flex-row gap-4 min-h-0 overflow-y-auto md:overflow-hidden pointer-events-auto">
       
       {/* CENTER AREA: Infrastructure Grid (CCTV / BMS) */}
       <div className="flex-1 border border-white/5 rounded-xl bg-black overflow-hidden shadow-2xl relative min-h-0 min-h-[320px] md:min-h-0">

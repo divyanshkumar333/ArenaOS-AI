@@ -1,28 +1,34 @@
 'use client'
 
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Grid, Sparkles, ContactShadows, Environment, useGLTF, CameraControls, Html, shaderMaterial, QuadraticBezierLine } from '@react-three/drei'
+import { Grid, Sparkles, ContactShadows, Environment, useGLTF, CameraControls, Html, shaderMaterial, QuadraticBezierLine, Text, CameraShake } from '@react-three/drei'
 import { Play, Pause, Flame, RotateCcw, Compass, RotateCw, ZoomIn, ZoomOut, RefreshCw, Layers, Brain } from 'lucide-react'
-import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
+import { EffectComposer, Bloom, Vignette, HueSaturation, Glitch, Scanline, ChromaticAberration, DepthOfField } from '@react-three/postprocessing'
 import { useZoneStore, Zone } from '@/store/useZoneStore'
 import React, { Suspense, useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import * as THREE from 'three'
 import { extend } from '@react-three/fiber'
 import type CameraControlsImpl from 'camera-controls'
 import { DroneEntity } from '@/components/DroneEntity'
+import { MedicalUnit } from '@/components/MedicalUnit'
+import { SecurityUnit } from '@/components/SecurityUnit'
 import { motion, AnimatePresence } from 'framer-motion'
 import { LayoutGrid, BarChart3, XCircle } from 'lucide-react'
+import { CrowdSystem } from '@/components/CrowdSystem'
+import { VehicleSystem } from './VehicleSystem'
 import { CrowdForecastChart } from '@/components/CrowdForecastChart'
 import { useIsMobile } from '@/hooks/useMediaQuery'
+import { TimeMachineScrubber } from '@/components/TimeMachineScrubber'
+import { FireEffect } from '@/components/FireEffect'
 
 import { PredictionsPanel } from '@/components/PredictionsPanel'
 const ZONE_POSITIONS: Record<string, [number, number, number]> = {
-  "zone_1": [200, 2, 0],    // Gate 3 (East)
-  "zone_2": [-100, 15, 0],  // Section 112 (West Seating)
-  "zone_3": [0, 5, -240],   // Concourse North
-  "zone_4": [-120, 35, 0],  // VIP Lounge (West Upper)
-  "zone_5": [0, 2, 240],    // Gate 1 (South)
-  "zone_6": [100, 15, 0],   // Section 115 (East Seating)
+  "zone_1": [180, 5, 0],    // Gate 3 (East Entrance)
+  "zone_2": [-140, 15, 0],  // Section 112 (West Seating)
+  "zone_3": [0, 5, -145],   // Concourse North (North Entrance)
+  "zone_4": [-150, 25, 0],  // VIP Lounge (West Upper)
+  "zone_5": [0, 5, 145],    // Gate 1 (South Entrance)
+  "zone_6": [140, 15, 0],   // Section 115 (East Seating)
 }
 
 // 1. Custom Heatmap Shader
@@ -103,7 +109,7 @@ function EvacuationRoute() {
   if (!activeIncident || activeIncident.severity !== 'critical') return null
 
   const startPos = ZONE_POSITIONS[activeIncident.zone_id] || [0, 0, 0]
-  const endPos: [number, number, number] = [0, 0, 280] // Nearest Exit (South Gate)
+  const endPos: [number, number, number] = [0, 0, 145] // Nearest Exit (South Gate)
 
   return (
     <QuadraticBezierLine
@@ -121,8 +127,68 @@ function EvacuationRoute() {
   )
 }
 
+function GateModel({ position, rotation = [0, 0, 0], scale = [1, 1, 1] }: { position: [number, number, number], rotation?: [number, number, number], scale?: [number, number, number] }) {
+  // A futuristic "neon banana" themed gate structure
+  return (
+    <group position={position} rotation={rotation} scale={scale}>
+      {/* Main Structural Arch */}
+      <mesh position={[0, 9, 0]}>
+        <boxGeometry args={[18, 18, 3]} />
+        <meshStandardMaterial color="#1a1a1a" metalness={0.9} roughness={0.1} />
+      </mesh>
+      {/* Hollow center for people to walk through */}
+      <mesh position={[0, 6, 0]}>
+        <boxGeometry args={[12, 12, 3.1]} />
+        <meshBasicMaterial color="#000000" colorWrite={false} depthWrite={true} />
+      </mesh>
+
+      {/* Glowing Neon Banana Accents (Inner Ring) */}
+      <mesh position={[-6.25, 6, 0]}>
+        <boxGeometry args={[0.5, 12, 3.2]} />
+        <meshBasicMaterial color="#ffe135" toneMapped={false} />
+      </mesh>
+      <mesh position={[6.25, 6, 0]}>
+        <boxGeometry args={[0.5, 12, 3.2]} />
+        <meshBasicMaterial color="#ffe135" toneMapped={false} />
+      </mesh>
+      <mesh position={[0, 12.25, 0]}>
+        <boxGeometry args={[13, 0.5, 3.2]} />
+        <meshBasicMaterial color="#ffe135" toneMapped={false} />
+      </mesh>
+
+      {/* Glass Turnstile Dividers */}
+      <mesh position={[-3, 3, 0]}>
+        <boxGeometry args={[0.2, 6, 4]} />
+        <meshPhysicalMaterial color="#ffffff" transmission={0.9} opacity={1} roughness={0} />
+      </mesh>
+      <mesh position={[0, 3, 0]}>
+        <boxGeometry args={[0.2, 6, 4]} />
+        <meshPhysicalMaterial color="#ffffff" transmission={0.9} opacity={1} roughness={0} />
+      </mesh>
+      <mesh position={[3, 3, 0]}>
+        <boxGeometry args={[0.2, 6, 4]} />
+        <meshPhysicalMaterial color="#ffffff" transmission={0.9} opacity={1} roughness={0} />
+      </mesh>
+
+      {/* Holographic Signage above */}
+      <mesh position={[0, 15, 1.6]}>
+        <planeGeometry args={[10, 2.5]} />
+        <meshBasicMaterial color="#000000" opacity={0.8} transparent />
+      </mesh>
+      <Text position={[0, 15, 1.7]} fontSize={1.5} color="#ffe135" anchorX="center" anchorY="middle">
+        GATE 3
+      </Text>
+      <Text position={[0, 14, 1.7]} fontSize={0.5} color="#ffffff" anchorX="center" anchorY="middle">
+        SECURITY SCAN ACTIVE
+      </Text>
+    </group>
+  )
+}
+
 function StadiumModel({ isMobile }: { isMobile: boolean }) {
   const { scene } = useGLTF('/models/modern_stadium_optimized.glb')
+
+  const ref = useRef<THREE.Group>(null)
 
   useEffect(() => {
     if (!isMobile) {
@@ -135,8 +201,47 @@ function StadiumModel({ isMobile }: { isMobile: boolean }) {
     }
   }, [scene, isMobile]);
 
+
   // Centering the model based on its bounding box calculations
-  return <primitive object={scene} scale={0.06} position={[-78, -2, 124]} />
+  return <primitive ref={ref} object={scene} scale={0.06} position={[-78, -2, 124]} />
+}
+
+function SunLighting({ isMobile }: { isMobile: boolean }) {
+  const offset = useZoneStore(state => state.predictiveTimeOffset)
+  const sunRef = useRef<THREE.DirectionalLight>(null)
+
+  useFrame((state, delta) => {
+    if (sunRef.current) {
+      // Base time is roughly afternoon.
+      // offset is 0 to 60 mins. Let's make 60 mins equal a 60 degree rotation!
+      const targetAngle = -Math.PI / 4 - (offset / 60) * (Math.PI / 3)
+      sunRef.current.position.x = THREE.MathUtils.lerp(sunRef.current.position.x, Math.cos(targetAngle) * 50, delta * 2)
+      sunRef.current.position.y = THREE.MathUtils.lerp(sunRef.current.position.y, Math.sin(targetAngle) * 50 + 10, delta * 2)
+      sunRef.current.position.z = THREE.MathUtils.lerp(sunRef.current.position.z, Math.sin(targetAngle) * 20, delta * 2)
+
+      // Color shifts to orange/red at sunset
+      const color = new THREE.Color()
+      color.lerpColors(new THREE.Color('#fffaf0'), new THREE.Color('#ff7b00'), offset / 60)
+      sunRef.current.color.copy(color)
+      sunRef.current.intensity = 1.1 - (offset / 60) * 0.5
+    }
+  })
+
+  return (
+    <directionalLight
+      ref={sunRef}
+      position={[20, 45, 20]}
+      intensity={1.1}
+      color="#fffaf0"
+      castShadow={!isMobile}
+      shadow-mapSize={[1024, 1024]}
+      shadow-camera-left={-60}
+      shadow-camera-right={60}
+      shadow-camera-top={60}
+      shadow-camera-bottom={-60}
+      shadow-bias={-0.0005}
+    />
+  )
 }
 
 /**
@@ -153,13 +258,13 @@ function LedRibbon() {
   return (
     <mesh position={[0, 3, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <ringGeometry args={[140, 142, 64]} />
-      <meshStandardMaterial 
-        ref={matRef} 
-        color="#0a84ff" 
-        emissive="#0a84ff" 
-        emissiveIntensity={1.2} 
-        transparent 
-        opacity={0.65} 
+      <meshStandardMaterial
+        ref={matRef}
+        color="#0a84ff"
+        emissive="#0a84ff"
+        emissiveIntensity={1.2}
+        transparent
+        opacity={0.65}
       />
     </mesh>
   )
@@ -199,6 +304,48 @@ function ScanningRing() {
 }
 
 /**
+ * Predictive AI Confidence Rings
+ */
+function ConfidenceRings() {
+  const predictions = useZoneStore(state => state.predictions)
+  const offset = useZoneStore(state => state.predictiveTimeOffset)
+
+  return (
+    <>
+      {offset > 0 && predictions.filter(p => !p.resolved).map(p => {
+        const pos = ZONE_POSITIONS[p.zone_id]
+        if (!pos) return null
+        return <ConfidenceRing key={p.id} pos={pos} severity={p.severity} />
+      })}
+    </>
+  )
+}
+
+function ConfidenceRing({ pos, severity }: { pos: number[], severity: string }) {
+  const ringRef = useRef<THREE.Mesh>(null)
+
+  useFrame((state) => {
+    if (ringRef.current) {
+      const t = state.clock.getElapsedTime()
+      const scale = 1.0 + (t * 0.8) % 2.0
+      ringRef.current.scale.set(scale, scale, 1)
+      if (ringRef.current.material) {
+        (ringRef.current.material as any).opacity = (1.0 - scale / 2.0) * 0.6
+      }
+    }
+  })
+
+  const color = severity === 'critical' ? '#ef4444' : '#eab308'
+
+  return (
+    <mesh ref={ringRef} position={[pos[0], pos[1] + 1.2, pos[2]]} rotation={[-Math.PI / 2, 0, 0]}>
+      <ringGeometry args={[25, 26.5, 64]} />
+      <meshBasicMaterial color={color} transparent opacity={0.6} depthWrite={false} blending={THREE.AdditiveBlending} />
+    </mesh>
+  )
+}
+
+/**
  * Floating digital twin diagnostic scoreboard
  */
 function VirtualScoreboard() {
@@ -214,7 +361,7 @@ function VirtualScoreboard() {
   }, [activeIncident])
 
   return (
-    <Html position={[0, 48, 0]} center>
+    <Html position={[0, 48, 0]} center style={{ pointerEvents: 'none' }}>
       <div className="bg-[#0b0c10]/92 border border-white/[0.08] p-3 rounded-lg text-center font-mono shadow-2xl backdrop-blur-xl min-w-[170px] select-none pointer-events-none">
         <div className="text-[8px] text-gray-500 uppercase tracking-widest mb-1">Virtual Scoreboard</div>
         <div className={`text-xs font-bold tracking-wider ${activeIncident ? 'text-red-500 animate-pulse' : 'text-accent'}`}>{data.score}</div>
@@ -226,7 +373,7 @@ function VirtualScoreboard() {
 
 function ZoneMarkerInner({ zone, onClick, hovered, setHovered, pos }: { zone: Zone; onClick: (pos: [number, number, number]) => void; hovered: boolean; setHovered: (h: boolean) => void; pos: [number, number, number] }) {
   const meshRef = useRef<THREE.Mesh>(null)
-  
+
   const isCritical = zone.status === 'critical'
   const isWarning = zone.status === 'warning'
   const isVisible = isCritical || isWarning || hovered
@@ -304,17 +451,65 @@ function ZoneMarkers({ layers, onClick }: { layers: any; onClick: (pos: [number,
 
 function SceneController({ controlsRef, isOrbiting }: { controlsRef: any; isOrbiting: boolean }) {
   const activeIncident = useZoneStore(state => state.activeIncident)
+  const cctvTakeover = useZoneStore(state => state.cctvTakeover)
+  const demoStage = useZoneStore(state => state.demoStage)
+  
+  // Persistent vectors for cinematic math to avoid garbage collection
+  const dPos = useMemo(() => new THREE.Vector3(), [])
+  const dTarget = useMemo(() => new THREE.Vector3(), [])
+  const toTarget = useMemo(() => new THREE.Vector3(), [])
+  const idealCameraPos = useMemo(() => new THREE.Vector3(), [])
+  const offset = useMemo(() => new THREE.Vector3(), [])
 
   useFrame((state, delta) => {
-    if (controlsRef.current && !controlsRef.current.active) {
-      if (isOrbiting) {
-        if (!activeIncident) {
-          const t = state.clock.getElapsedTime()
-          controlsRef.current.azimuthAngle += 0.012 * delta
-          controlsRef.current.polarAngle += Math.sin(t * 0.4) * 0.0002
-        } else {
-          controlsRef.current.azimuthAngle += 0.04 * delta
-        }
+    if (!controlsRef.current) return
+
+    const t = state.clock.getElapsedTime()
+    const store = useZoneStore.getState()
+    const dronePos = store.primaryDronePosition
+    const droneTarget = store.primaryDroneTarget
+
+    // Cinematic Drone Follow Mode (Stage 3)
+    if (cctvTakeover === 'CAM-01' && demoStage === 3 && dronePos && droneTarget) {
+      dPos.set(dronePos[0], dronePos[1], dronePos[2])
+      dTarget.set(droneTarget[0], droneTarget[1], droneTarget[2])
+      
+      toTarget.copy(dTarget).sub(dPos).normalize()
+      const bank = Math.sin(t * 1.5) * 4 // Slight banking
+      
+      // Rule of thirds framing: Behind, above, and off-center
+      offset.set(25, 20 + bank, 0)
+      
+      idealCameraPos.copy(dPos)
+        .addScaledVector(toTarget, -50)
+        .add(offset)
+
+      // Very fast smoothTime for tight tracking without robotics
+      controlsRef.current.smoothTime = 0.5
+      controlsRef.current.setLookAt(
+        idealCameraPos.x, idealCameraPos.y, idealCameraPos.z,
+        dTarget.x, dTarget.y - 5, dTarget.z,
+        true
+      )
+      return
+    }
+
+    if (controlsRef.current.active) return
+
+    // Background cinematic movement
+    if (isOrbiting) {
+      if (demoStage === 2) {
+        // Stage 2 - Massive scale orbit & gentle parallax
+        controlsRef.current.azimuthAngle += delta * 0.02
+        controlsRef.current.polarAngle += Math.sin(t * 0.1) * 0.0001
+      } else if (!activeIncident && demoStage === 0) {
+        // Standard idle sway
+        controlsRef.current.azimuthAngle += Math.sin(t * 0.15) * 0.0006
+        controlsRef.current.polarAngle += Math.cos(t * 0.22) * 0.0003
+      } else if (activeIncident && !cctvTakeover) {
+        // Tension effect during un-scripted incidents
+        controlsRef.current.azimuthAngle += Math.sin(t * 1.2) * 0.0003
+        controlsRef.current.polarAngle += Math.cos(t * 1.8) * 0.00015
       }
     }
   })
@@ -322,34 +517,102 @@ function SceneController({ controlsRef, isOrbiting }: { controlsRef: any; isOrbi
   useEffect(() => {
     if (!controlsRef.current) return
 
+    if (demoStage > 0) {
+      if (demoStage === 1) {
+        // Stage 1 - Boot: High above, descend through clouds, reveal gradually
+        controlsRef.current.smoothTime = 0
+        controlsRef.current.setLookAt(0, 1000, 0, 0, 0, 0, false)
+        setTimeout(() => {
+          controlsRef.current.smoothTime = 12.0 // Very slow cinematic descent
+          controlsRef.current.setLookAt(350, 250, 350, 0, 0, 0, true)
+        }, 100)
+      } else if (demoStage === 2) {
+        // Stage 2 - Live Operations: Settle into slow orbit
+        controlsRef.current.smoothTime = 5.0
+        controlsRef.current.setLookAt(420, 180, 420, 0, -20, 0, true)
+      } else if (demoStage === 3) {
+        // Stage 3 - Drone Launch: Rotate toward affected gate before drone takes over
+        if (!cctvTakeover) {
+          controlsRef.current.smoothTime = 4.0
+          controlsRef.current.setLookAt(350, 150, 150, 210, 5, 0, true)
+        }
+      } else if (demoStage === 4) {
+        // Stage 4 - Investigation: Section 112 medical. Dolly-in slowly.
+        controlsRef.current.smoothTime = 4.0 
+        controlsRef.current.setLookAt(-80, 50, 60, -140, 10, 0, false)
+        setTimeout(() => {
+          controlsRef.current.smoothTime = 25.0 // Extremely slow dolly-in holding the shot
+          controlsRef.current.setLookAt(-40, 20, 20, -140, 10, 0, true)
+        }, 500)
+      } else if (demoStage === 5) {
+        // Stage 5 - Suspicious Package: Low height tracking for tension
+        controlsRef.current.smoothTime = 5.0
+        controlsRef.current.setLookAt(60, 12, -50, 0, 5, -155, false)
+        setTimeout(() => {
+          controlsRef.current.smoothTime = 30.0
+          controlsRef.current.setLookAt(-20, 12, -80, 0, 5, -155, true)
+        }, 500)
+      } else if (demoStage === 6) {
+        // Stage 6 - Resolution / Weather: Slowly rise, reveal stadium recovering
+        controlsRef.current.smoothTime = 8.0
+        controlsRef.current.setLookAt(280, 250, 280, 0, 0, 0, true)
+      } else if (demoStage === 7) {
+        // Stage 7 - Power Fluctuation: Tense, slightly off-axis
+        controlsRef.current.smoothTime = 2.5
+        controlsRef.current.setLookAt(200, 120, 280, -60, -10, -60, true)
+      } else if (demoStage === 8) {
+        // Final Scene: Very slow crane pull-back. Entire stadium visible.
+        controlsRef.current.smoothTime = 15.0
+        controlsRef.current.setLookAt(500, 400, 500, 0, 0, 0, true)
+      } else if (demoStage === 9) {
+        controlsRef.current.smoothTime = 4.0
+        controlsRef.current.setLookAt(350, 250, 350, 0, 0, 0, true)
+      }
+      return
+    }
+
+    if (cctvTakeover) {
+      controlsRef.current.smoothTime = 1.2
+      if (cctvTakeover === 'CAM-01') {
+        controlsRef.current.setLookAt(270, 25, 40, 210, 5, 0, true)
+      } else if (cctvTakeover === 'CAM-02') {
+        controlsRef.current.setLookAt(-60, 15, 0, -140, 10, 0, true)
+      } else if (cctvTakeover === 'CAM-03') {
+        controlsRef.current.setLookAt(0, 15, -110, 0, 5, -155, true)
+      } else {
+        controlsRef.current.setLookAt(-80, 40, 0, -150, 30, 0, true)
+      }
+      return
+    }
+
     if (activeIncident) {
       const zones = useZoneStore.getState().zones
       const zone = zones.find(z => z.id === activeIncident.zone_id)
       if (!zone) return
-
       const pos = ZONE_POSITIONS[zone.id] || [0, 0, 0]
-      
-      // Step 1: Dramatic Swoop Out / Arena Overview
-      controlsRef.current.smoothTime = 0.5
-      controlsRef.current.setLookAt(280, 220, 280, 0, 0, 0, true)
 
-      // Step 2: Cinematic dive-in rotation and close-up focus
+      controlsRef.current.smoothTime = 1.5
+      controlsRef.current.setLookAt(300, 240, 300, 0, 0, 0, true)
+      
       const t1 = setTimeout(() => {
         if (!controlsRef.current) return
-        controlsRef.current.smoothTime = 1.3
-        controlsRef.current.setLookAt(
-          pos[0] + 55, pos[1] + 35, pos[2] + 55,
-          pos[0], pos[1], pos[2],
-          true
-        )
-      }, 700)
-
+        controlsRef.current.smoothTime = 2.5 // Smooth ease-in
+        if (activeIncident.zone_id === 'zone_1') {
+          controlsRef.current.setLookAt(290, 60, 80, 210, 5, 0, true)
+        } else if (activeIncident.zone_id === 'zone_2') {
+          controlsRef.current.setLookAt(-40, 60, 80, -140, 10, 0, true)
+        } else if (activeIncident.zone_id === 'zone_3') {
+          controlsRef.current.setLookAt(60, 60, -70, 0, 5, -155, true)
+        } else {
+          controlsRef.current.setLookAt(pos[0] + 80, pos[1] + 60, pos[2] + 80, pos[0], pos[1], pos[2], true)
+        }
+      }, 1500)
       return () => clearTimeout(t1)
     } else {
-      controlsRef.current.smoothTime = 1.2
+      controlsRef.current.smoothTime = 1.5
       controlsRef.current.setLookAt(250, 180, 250, 0, 0, 0, true)
     }
-  }, [activeIncident, controlsRef])
+  }, [activeIncident, cctvTakeover, controlsRef, demoStage])
 
   return (
     <CameraControls
@@ -365,6 +628,7 @@ function SceneController({ controlsRef, isOrbiting }: { controlsRef: any; isOrbi
 export function StadiumCanvas() {
   const systemStatus = useZoneStore(state => state.systemStatus)
   const activeIncident = useZoneStore(state => state.activeIncident)
+  const predictiveTimeOffset = useZoneStore(state => state.predictiveTimeOffset)
   const [activeView, setActiveView] = useState('3D Twin')
   const isMobile = useIsMobile()
 
@@ -376,6 +640,7 @@ export function StadiumCanvas() {
     sensors: true,
     cctv: true,
     drones: true,
+    medical: true,
     grid: true,
     weather: false
   })
@@ -387,7 +652,8 @@ export function StadiumCanvas() {
         ...prev,
         heatmap: true,
         sensors: true,
-        drones: true
+        drones: true,
+        medical: true
       }))
     }
   }, [activeIncident])
@@ -437,13 +703,13 @@ export function StadiumCanvas() {
   const handleCameraReset = () => {
     if (controlsRef.current) {
       controlsRef.current.smoothTime = 0.8
-      controlsRef.current.setLookAt(250, 180, 250, 0, 0, 0, true)
+      controlsRef.current.setLookAt(350, 250, 350, 0, 0, 0, true)
     }
   }
 
   const handleZoom = (direction: 'in' | 'out') => {
     if (controlsRef.current) {
-      controlsRef.current.dolly(direction === 'in' ? 5 : -5, true)
+      controlsRef.current.dolly(direction === 'in' ? 50 : -50, true)
     }
   }
 
@@ -480,7 +746,7 @@ export function StadiumCanvas() {
     } else if (activeView === '3D Twin') {
       if (controlsRef.current) {
         controlsRef.current.smoothTime = 1.0
-        controlsRef.current.setLookAt(250, 180, 250, 0, 0, 0, true)
+        controlsRef.current.setLookAt(350, 250, 350, 0, 0, 0, true)
       }
     } else if (activeView === 'Compare') {
       setShowDecisionMatrix(true)
@@ -491,35 +757,78 @@ export function StadiumCanvas() {
     }
   }, [activeView, setShowDecisionMatrix, setPlaybackMode, playbackMode])
 
+  const demoStage = useZoneStore(state => state.demoStage)
+
+  useEffect(() => {
+    if (!controlsRef.current) return
+    
+    // Smooth cinematic pan based on demo stage
+    switch (demoStage) {
+      case 1: // Boot
+        controlsRef.current.smoothTime = 2.0
+        controlsRef.current.setLookAt(500, 300, 500, 0, 0, 0, true)
+        break
+      case 2: // Normal operations
+        controlsRef.current.smoothTime = 4.0 // Slow elegant pan
+        controlsRef.current.setLookAt(350, 250, 350, 0, 0, 0, true)
+        break
+      case 3: // Gate 3 detect
+        controlsRef.current.smoothTime = 2.5
+        controlsRef.current.setLookAt(
+          ZONE_POSITIONS['zone_1'][0] + 80, 40, ZONE_POSITIONS['zone_1'][2] + 80, 
+          ZONE_POSITIONS['zone_1'][0], 0, ZONE_POSITIONS['zone_1'][2], true
+        )
+        break
+      case 4: // Medical Emergency 
+        controlsRef.current.smoothTime = 2.5
+        controlsRef.current.setLookAt(
+          ZONE_POSITIONS['zone_2'][0] - 80, 60, ZONE_POSITIONS['zone_2'][2] - 80, 
+          ZONE_POSITIONS['zone_2'][0], 0, ZONE_POSITIONS['zone_2'][2], true
+        )
+        break
+      case 5: // Suspicious Package
+        controlsRef.current.smoothTime = 2.0
+        controlsRef.current.setLookAt(
+          ZONE_POSITIONS['zone_3'][0], 90, ZONE_POSITIONS['zone_3'][2] + 100, 
+          ZONE_POSITIONS['zone_3'][0], 0, ZONE_POSITIONS['zone_3'][2], true
+        )
+        break
+      case 6: // Weather 
+        controlsRef.current.smoothTime = 3.0
+        controlsRef.current.setLookAt(100, 380, 100, 0, 0, 0, true)
+        break
+      case 7: // Power Outage
+        controlsRef.current.smoothTime = 1.0 // Snappy cut
+        controlsRef.current.setLookAt(-200, 150, -200, 0, 0, 0, true)
+        break
+      case 8: // Exec Summary
+        controlsRef.current.smoothTime = 3.0
+        controlsRef.current.setLookAt(350, 250, 350, 0, 0, 0, true)
+        break
+    }
+  }, [demoStage])
+
   return (
     <div className="absolute inset-0 bg-[#050510] select-none">
       {/* Vanta CLOUDS background */}
       <div ref={vantaRef} className="absolute inset-0" style={{ zIndex: 0 }} />
 
       {/* Canvas */}
-      <Canvas dpr={isMobile ? [1, 1] : [1, 2]} camera={{ position: [250, 180, 250], fov: 38 }} shadows={!isMobile} gl={{ alpha: true, antialias: !isMobile }} style={{ position: 'relative', zIndex: 1, background: 'transparent' }}>
-        <fog attach="fog" args={['#050510', 800, 1800]} />
+      <Canvas dpr={isMobile ? [1, 1] : [1, 2]} camera={{ position: [350, 250, 350], fov: 45 }} shadows={!isMobile} gl={{ alpha: true, antialias: !isMobile }} style={{ position: 'relative', zIndex: 1, background: 'transparent' }}>
+        <fog attach="fog" args={[systemStatus === 'CRITICAL' ? '#200000' : '#050510', 800, 1800]} />
 
         {/* Cinematic ambient and fill lights */}
-        <ambientLight intensity={0.3} color="#4fd1c5" />
-        <hemisphereLight groundColor="#000000" color="#3b82f6" intensity={0.35} />
+        <ambientLight intensity={systemStatus === 'CRITICAL' ? 0.5 : 0.3} color={systemStatus === 'CRITICAL' ? '#ff453a' : '#4fd1c5'} />
+        <hemisphereLight groundColor="#000000" color={systemStatus === 'CRITICAL' ? '#ef4444' : '#3b82f6'} intensity={systemStatus === 'CRITICAL' ? 0.5 : 0.35} />
 
-        <directionalLight
-          position={[20, 45, 20]}
-          intensity={1.1}
-          color="#fffaf0"
-          castShadow={!isMobile}
-          shadow-mapSize={[1024, 1024]}
-          shadow-camera-left={-60}
-          shadow-camera-right={60}
-          shadow-camera-top={60}
-          shadow-camera-bottom={-60}
-          shadow-bias={-0.0005}
-        />
+        <SunLighting isMobile={isMobile} />
 
         {/* Cinematic Rim Lights */}
-        <directionalLight position={[-40, 20, -40]} intensity={0.6} color="#3b82f6" />
-        <directionalLight position={[40, 15, -40]} intensity={0.4} color="#4fd1c5" />
+        {/* Add Crowd and Vehicle Simulations */}
+        <CrowdSystem />
+        <VehicleSystem />
+        <directionalLight position={[-40, 20, -40]} intensity={0.6} color={systemStatus === 'CRITICAL' ? '#ff0000' : '#3b82f6'} />
+        <directionalLight position={[40, 15, -40]} intensity={0.4} color={systemStatus === 'CRITICAL' ? '#ff453a' : '#4fd1c5'} />
 
         <Suspense fallback={null}>
           <Environment preset="city" environmentIntensity={0.15} />
@@ -528,13 +837,29 @@ export function StadiumCanvas() {
 
           {!isMobile && <ContactShadows resolution={256} scale={80} blur={2.0} opacity={0.6} far={8} color="#000000" />}
 
-          {layers.grid && (
-            <Grid position={[0, -0.05, 0]} infiniteGrid fadeDistance={70} cellColor="#0a84ff" sectionColor="#003566" cellThickness={0.4} sectionThickness={0.8} />
-          )}
+          {/* Grid disabled for realistic stadium */}
+
+          {/* Gate 3 Structure */}
+          <GateModel position={[ZONE_POSITIONS['zone_1'][0] + 30, ZONE_POSITIONS['zone_1'][1], ZONE_POSITIONS['zone_1'][2]]} rotation={[0, Math.PI / 2, 0]} scale={[2.5, 2.5, 2.5]} />
+
+          {/* Exterior Ground Pad (Localized specifically for Gate 3 Crowd) */}
+          <mesh position={[ZONE_POSITIONS['zone_1'][0] + 30, -0.4, ZONE_POSITIONS['zone_1'][2]]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+            <planeGeometry args={[160, 160]} />
+            <meshStandardMaterial color="#1e293b" roughness={0.9} metalness={0.1} />
+          </mesh>
+
+          {/* Fire Effect for zone_3 */}
+          <FireEffect />
 
           {layers.heatmap && <HeatmapFloor />}
           <EvacuationRoute />
-          {layers.drones && <DroneEntity />}
+          {layers.drones && [0, 1, 2, 3].map(i => <DroneEntity key={i} index={i} />)}
+          {layers.medical && [0, 1].map(i => <MedicalUnit key={i} index={i} />)}
+          {layers.medical && [0, 1, 2, 3, 4, 5, 6, 7].map(i => {
+            const angle = (i / 8) * Math.PI * 2;
+            const radius = 180;
+            return <SecurityUnit key={i} index={i} initialPosition={[radius * Math.cos(angle), 0, radius * Math.sin(angle)]} />
+          })}
 
           {/* Stadium Bowl Crowd Sparkles */}
           {layers.occupancy && (
@@ -564,119 +889,108 @@ export function StadiumCanvas() {
           {/* High-tech Twin Overlays */}
           <LedRibbon />
           <ScanningRing />
+          <ConfidenceRings />
           <VirtualScoreboard />
 
           <ZoneMarkers layers={layers} onClick={handleMarkerClick} />
           <SceneController controlsRef={controlsRef} isOrbiting={isOrbiting} />
+          {demoStage === 7 && <CameraShake maxPitch={0.01} maxRoll={0.01} maxYaw={0.01} pitchFrequency={1.5} rollFrequency={1.5} yawFrequency={1.5} />}
         </Suspense>
 
         {!isMobile && (
           <EffectComposer multisampling={0} enableNormalPass={false}>
             <Bloom luminanceThreshold={0.97} intensity={0.25} mipmapBlur={false} />
             <Vignette offset={0.15} darkness={0.8} />
+            {playbackMode ? (
+              <>
+                <HueSaturation saturation={-0.6} hue={-0.1} />
+                <Scanline density={1.5} opacity={0.3} />
+                <Glitch delay={[1.5, 3.5] as any} duration={[0.1, 0.3] as any} strength={[0.01, 0.05] as any} active={true} ratio={0.85} />
+              </>
+            ) : <></>}
+            {predictiveTimeOffset > 0 ? (
+              <>
+                {/* Premium Temporal Grid effect (cyan shifted, scanlines) */}
+                <HueSaturation saturation={-0.2} hue={0.3} />
+                <Scanline density={2.0} opacity={0.15} />
+              </>
+            ) : <></>}
           </EffectComposer>
         )}
       </Canvas>
 
-      {/* Floating HUD View Controls */}
-      {!isMobile && (
-        <div className="absolute top-4 left-4 z-[80] flex flex-col gap-1.5 p-1.5 bg-[rgba(18,18,20,0.7)] backdrop-blur-xl border border-white/[0.08] rounded-xl text-gray-300 shadow-2xl pointer-events-auto">
-        <button
-          onClick={() => setIsOrbiting(!isOrbiting)}
-          className={`flex items-center justify-center p-2 rounded-lg transition-colors border ${isOrbiting ? 'bg-accent/20 text-accent border-accent/30' : 'border-transparent bg-white/5 hover:bg-white/10 hover:text-white'}`}
-          title={isOrbiting ? "Stop Auto-Orbit" : "Start Auto-Orbit"}
-        >
-          <Compass className="w-3 h-3" />
-        </button>
-        
-        <div className="w-full h-[1px] bg-white/10 my-0.5" />
 
-        <button onClick={() => handleRotate(0.5)} className="flex items-center justify-center p-2 rounded-lg border border-transparent bg-white/5 hover:bg-white/10 hover:text-white transition-colors" title="Rotate Right">
-          <RotateCw className="w-3 h-3" />
-        </button>
-        <button onClick={() => handleRotate(-0.5)} className="flex items-center justify-center p-2 rounded-lg border border-transparent bg-white/5 hover:bg-white/10 hover:text-white transition-colors" title="Rotate Left">
-          <RotateCcw className="w-3 h-3" />
-        </button>
-        <button onClick={() => handleZoom('in')} className="flex items-center justify-center p-2 rounded-lg border border-transparent bg-white/5 hover:bg-white/10 hover:text-white transition-colors" title="Zoom In">
-          <ZoomIn className="w-3 h-3" />
-        </button>
-        <button onClick={() => handleZoom('out')} className="flex items-center justify-center p-2 rounded-lg border border-transparent bg-white/5 hover:bg-white/10 hover:text-white transition-colors" title="Zoom Out">
-          <ZoomOut className="w-3 h-3" />
-        </button>
-        
-        <div className="w-full h-[1px] bg-white/10 my-0.5" />
 
-        <button onClick={handleCameraReset} className="flex items-center justify-center p-2 rounded-lg border border-transparent bg-white/5 hover:bg-white/10 hover:text-white transition-colors" title="Reset View">
-          <RefreshCw className="w-3 h-3" />
-        </button>
+      {/* HUD overlay for counts */}
+      <div className="absolute bottom-4 left-[272px] z-[80] bg-[rgba(0,0,0,0.5)] text-white px-2 py-1 rounded hidden" style={{ fontSize: '10px' }}>
+        <div id="stats">
+          {/* Placeholder – will be filled by CrowdSystem via window object */}
         </div>
-      )}
-
-      {/* Floating HUD Diagnostic Layers & AI Predictions */}
+      </div>
       {!isMobile && (
-        <div className="absolute top-4 right-4 z-[80] flex flex-col items-end gap-2 pointer-events-auto">
-        <div className="flex gap-2">
-          {/* AI Predictions Toggle Button */}
-          <button
-            onClick={() => setShowPredictions(!showPredictions)}
-            className={`flex items-center space-x-2 px-3 py-1.5 bg-[rgba(18,18,20,0.7)] backdrop-blur-xl border rounded-xl text-gray-300 shadow-2xl hover:text-white transition-colors ${showPredictions ? 'border-accent/40 text-accent font-semibold' : 'border-white/[0.08]'}`}
-          >
-            <Brain className="w-3.5 h-3.5 text-accent" />
-            <span className="text-[11px]">Predictions</span>
-          </button>
-
-          {/* Layers Toggle Button */}
-          <button
-            onClick={() => setIsLayersOpen(!isLayersOpen)}
-            className={`flex items-center space-x-2 px-3 py-1.5 bg-[rgba(18,18,20,0.7)] backdrop-blur-xl border rounded-xl text-gray-300 shadow-2xl hover:text-white transition-colors ${isLayersOpen ? 'border-accent/40 text-accent font-semibold' : 'border-white/[0.08]'}`}
-          >
-            <Layers className="w-3.5 h-3.5" />
-            <span className="text-[11px]">Layers</span>
-          </button>
-        </div>
-
-        <AnimatePresence>
-          {isLayersOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              transition={{ duration: 0.15 }}
-              className="flex flex-col gap-1.5 p-3.5 bg-[rgba(18,18,20,0.85)] backdrop-blur-xl border border-white/[0.08] rounded-xl text-gray-300 w-44 shadow-2xl"
+        <div className="absolute top-24 right-[400px] z-[80] flex flex-col items-end gap-2 pointer-events-auto">
+          <div className="flex gap-2">
+            {/* AI Predictions Toggle Button */}
+            <button
+              onClick={() => setShowPredictions(!showPredictions)}
+              className={`flex items-center space-x-2 px-3 py-1.5 bg-[rgba(10,10,12,0.4)] backdrop-blur-2xl border rounded-xl text-gray-300 shadow-2xl hover:text-white transition-colors ${showPredictions ? 'border-accent/40 text-accent font-semibold' : 'border-white/[0.04]'}`}
             >
-              {(Object.keys(layers) as Array<keyof typeof layers>).map(layerKey => (
-                <div key={layerKey} className="flex items-center justify-between px-1.5 py-1 rounded-md hover:bg-white/5 transition-colors">
-                  <span className="text-white/80 font-medium text-[11px] capitalize">{layerKey}</span>
+              <Brain className="w-3.5 h-3.5 text-accent" />
+              <span className="text-[11px]">Predictions</span>
+            </button>
+
+            {/* Layers Toggle Button */}
+            <button
+              onClick={() => setIsLayersOpen(!isLayersOpen)}
+              className={`flex items-center space-x-2 px-3 py-1.5 bg-[rgba(10,10,12,0.4)] backdrop-blur-2xl border rounded-xl text-gray-300 shadow-2xl hover:text-white transition-colors ${isLayersOpen ? 'border-accent/40 text-accent font-semibold' : 'border-white/[0.04]'}`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span className="text-[11px]">Layers</span>
+            </button>
+          </div>
+
+          <AnimatePresence>
+            {isLayersOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                transition={{ duration: 0.15 }}
+                className="flex flex-col gap-1.5 p-3.5 bg-[rgba(18,18,20,0.85)] backdrop-blur-xl border border-white/[0.08] rounded-xl text-gray-300 w-44 shadow-2xl"
+              >
+                {(Object.keys(layers) as Array<keyof typeof layers>).map(layerKey => (
+                  <div key={layerKey} className="flex items-center justify-between px-1.5 py-1 rounded-md hover:bg-white/5 transition-colors">
+                    <span className="text-white/80 font-medium text-[11px] capitalize">{layerKey}</span>
+                    <button
+                      onClick={() => toggleLayer(layerKey)}
+                      className={`w-7 h-4 rounded-full p-0.5 transition-all duration-300 flex items-center border ${layers[layerKey] ? 'bg-accent/80 border-accent' : 'bg-transparent border-white/20'}`}
+                    >
+                      <div className={`w-2.5 h-2.5 rounded-full bg-white transition-all ${layers[layerKey] ? 'translate-x-3.5' : 'translate-x-0'}`} />
+                    </button>
+                  </div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {showPredictions && (
+              <motion.div
+                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                transition={{ duration: 0.15 }}
+                className="w-80 bg-[rgba(18,18,20,0.92)] backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden flex flex-col p-1"
+              >
+                <div className="flex justify-between items-center px-3 py-2 border-b border-white/5">
+                  <span className="text-xs font-bold text-white uppercase tracking-wider">AI Predictions Matrix</span>
                   <button
-                    onClick={() => toggleLayer(layerKey)}
-                    className={`w-7 h-4 rounded-full p-0.5 transition-all duration-300 flex items-center border ${layers[layerKey] ? 'bg-accent/80 border-accent' : 'bg-transparent border-white/20'}`}
+                    onClick={() => setShowPredictions(false)}
+                    className="p-1 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
                   >
-                    <div className={`w-2.5 h-2.5 rounded-full bg-white transition-all ${layers[layerKey] ? 'translate-x-3.5' : 'translate-x-0'}`} />
+                    <XCircle className="w-3.5 h-3.5" />
                   </button>
                 </div>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <AnimatePresence>
-          {showPredictions && (
-            <motion.div
-              initial={{ opacity: 0, y: -10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              transition={{ duration: 0.15 }}
-              className="w-80 bg-[rgba(18,18,20,0.92)] backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden flex flex-col p-1"
-            >
-              <div className="flex justify-between items-center px-3 py-2 border-b border-white/5">
-                <span className="text-xs font-bold text-white uppercase tracking-wider">AI Predictions Matrix</span>
-                <button
-                  onClick={() => setShowPredictions(false)}
-                  className="p-1 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
-                >
-                  <XCircle className="w-3.5 h-3.5" />
-                </button>
-              </div>
                 <div className="max-h-[300px] overflow-y-auto no-scrollbar">
                   <PredictionsPanel />
                 </div>
@@ -741,7 +1055,12 @@ export function StadiumCanvas() {
       </AnimatePresence>
 
       {/* Operations Console HUD Overlay */}
-      {!isMobile && <OperationsConsole activeView={activeView} setActiveView={setActiveView} />}
+      {!isMobile && (
+        <div className="absolute bottom-2 left-[632px] right-[408px] z-[80] pointer-events-none flex flex-col items-center gap-5">
+          <TimeMachineScrubber />
+          <OperationsConsole activeView={activeView} setActiveView={setActiveView} />
+        </div>
+      )}
     </div>
   )
 }
@@ -775,7 +1094,7 @@ const OperationsConsole = React.memo(
         if (!res.ok) throw new Error('API failed')
       } catch (e) {
         console.warn("Backend unavailable. Falling back to client-side simulation.", e)
-        
+
         // Generate dynamic consistent parameters
         let occupancy = 90
         let confidence = 0.95
@@ -830,11 +1149,11 @@ const OperationsConsole = React.memo(
           explanation,
           recommended_action
         }
-        
+
         const store = useZoneStore.getState()
         store.setActiveIncident(incident)
         store.addLog(incident)
-        
+
         const updatedZones = store.zones.map(z => {
           if (z.id === incident.zone_id) {
             return { ...z, occupancy, status: incident.severity as any }
@@ -854,7 +1173,7 @@ const OperationsConsole = React.memo(
         store.setActiveIncident(null)
         store.setShowImpactReport(false)
         store.setShowDecisionMatrix(false)
-        
+
         const baseZones = store.zones.map(z => {
           return { ...z, occupancy: z.baseline, status: 'normal' as const }
         })
@@ -875,95 +1194,23 @@ const OperationsConsole = React.memo(
     }, [])
 
     return (
-      <div className="absolute bottom-4 left-4 right-4 z-[80] pointer-events-none">
-        <div className="flex items-center justify-between bg-[rgba(28,28,30,0.62)] backdrop-blur-xl border border-white/[0.08] p-3 rounded-xl text-gray-300 font-mono text-[9px] gap-6 shadow-2xl overflow-x-auto no-scrollbar pointer-events-auto">
-
-          {/* Left Section: Playback Scrubber (Timeline Analysis) */}
-          <div className="flex items-center gap-3 bg-black/60 border border-white/10 px-4 py-2 rounded-lg flex-1 max-w-[360px]">
-            <span className="text-gray-300 font-bold shrink-0">Playback</span>
-            {historicalSnapshots.length > 0 ? (
-              <div className="flex items-center gap-3 w-full">
-                <button
-                  onClick={handleTogglePlayback}
-                  className={`p-1.5 rounded-full transition-all shrink-0 border ${playbackMode ? 'bg-white/10 text-white border-white/20' : 'bg-red-500/20 text-red-400 border-red-500/40 hover:bg-red-500/30'}`}
-                >
-                  {playbackMode ? <Play className="w-3 h-3" /> : <Pause className="w-3 h-3" />}
-                </button>
-
-                <input
-                  type="range"
-                  min={0}
-                  max={maxIndex}
-                  value={playbackMode ? playbackIndex : maxIndex}
-                  onChange={handlePlaybackChange}
-                  className="w-full h-1.5 bg-white/20 rounded-lg appearance-none cursor-pointer accent-accent"
-                />
-
-                <button
-                  onClick={() => setPlaybackMode(false)}
-                  className={`px-2.5 py-1 rounded text-[9px] font-bold shrink-0 uppercase tracking-widest border ${!playbackMode ? 'bg-red-500 text-white border-red-400 animate-pulse' : 'bg-white/10 text-gray-300 border-white/20 hover:bg-white/20 hover:text-white'}`}
-                >
-                  {!playbackMode ? 'LIVE' : 'SYNC'}
-                </button>
-              </div>
-            ) : (
-              <span className="text-[9px] text-gray-500 font-bold">AWAITING SNAPSHOTS...</span>
-            )}
-          </div>
-
-          {/* Center Section: View Navigation Tabs */}
-          <div className="flex bg-black/60 border border-white/10 p-1.5 rounded-lg gap-1.5 shrink-0">
-            {['2D Map', '3D Twin', 'Scenarios', 'Timeline', 'Compare', 'Analytics'].map(view => {
-              const isActive = activeView === view
-              return (
-                <button
-                  key={view}
-                  onClick={() => setActiveView(view)}
-                  className={`px-3.5 py-1.5 rounded-md transition-all border ${isActive ? 'bg-white/10 text-white font-bold border-white/20' : 'border-transparent text-gray-400 hover:bg-white/10 hover:text-white hover:border-white/20'}`}
-                >
-                  {view}
-                </button>
-              )
-            })}
-          </div>
-
-          {/* Right Section: Keyboard Simulator Controls */}
-          <div className="flex items-center gap-2 bg-black/60 border border-white/10 px-4 py-2 rounded-lg">
-            <span className="text-gray-400 font-bold mr-2">Simulate</span>
-            <button
-              onClick={() => triggerIncident('Gate 3 Overcrowding')}
-              className="flex items-center gap-1.5 hover:text-white hover:bg-white/10 transition-colors px-2.5 py-1 rounded-md border border-white/20 bg-white/5"
-              title="Trigger Gate 3 Overcrowding [Key 1]"
-            >
-              <span className="text-accent font-bold">[1]</span>
-              <span className="font-semibold text-gray-300">Gate 3</span>
-            </button>
-            <button
-              onClick={() => triggerIncident('Section 112 Medical Event')}
-              className="flex items-center gap-1.5 hover:text-white hover:bg-white/10 transition-colors px-2.5 py-1 rounded-md border border-white/20 bg-white/5"
-              title="Trigger Medical Event [Key 2]"
-            >
-              <span className="text-accent font-bold">[2]</span>
-              <span className="font-semibold text-gray-300">Medical</span>
-            </button>
-            <button
-              onClick={() => triggerIncident('Concourse North Fire Alarm')}
-              className="flex items-center gap-1.5 hover:text-white hover:bg-white/10 transition-colors px-2.5 py-1 rounded-md border border-white/20 bg-white/5"
-              title="Trigger Fire Alarm [Key 3]"
-            >
-              <span className="text-accent font-bold">[3]</span>
-              <span className="font-semibold text-gray-300">Fire</span>
-            </button>
-            <div className="w-px h-4 bg-white/20 mx-1"></div>
-            <button
-              onClick={resetSimulation}
-              className="flex items-center gap-1.5 text-red-400 hover:text-red-300 transition-colors px-2.5 py-1 rounded-md border border-red-500/40 hover:border-red-500/80 bg-red-500/10 hover:bg-red-500/20 font-bold"
-              title="Reset Simulation [Key 0]"
-            >
-              <span className="text-red-500/80 font-bold">[0]</span>
-              <span>Reset</span>
-            </button>
-          </div>
+      <div className="w-full max-w-2xl bg-[rgba(10,10,12,0.65)] backdrop-blur-3xl border border-white/[0.08] p-1.5 rounded-[24px] shadow-2xl flex items-center justify-between pointer-events-auto">
+        <div className="grid grid-cols-6 w-full gap-2 text-center">
+          {['3D Twin', '2D Map', 'Timeline', 'Scenarios', 'Analytics', 'Compare'].map(view => {
+            const isActive = activeView === view
+            return (
+              <button
+                key={view}
+                onClick={() => setActiveView(view)}
+                className={`py-2 px-3 text-[11px] font-mono tracking-wider uppercase rounded-xl transition-all border duration-300 min-w-0 truncate select-none ${isActive
+                    ? 'bg-accent/20 border-accent/50 text-accent font-bold shadow-[0_0_15px_rgba(10,132,255,0.25)]'
+                    : 'border-transparent text-gray-400 hover:bg-white/5 hover:text-white hover:border-white/10'
+                  }`}
+              >
+                {view}
+              </button>
+            )
+          })}
         </div>
       </div>
     )

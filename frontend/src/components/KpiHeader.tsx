@@ -44,7 +44,7 @@ export function KpiHeader() {
   const criticalZones = zones.filter(z => z.status === 'critical').length
 
   return (
-    <div className="w-full h-16 bg-[#1c1c1e]/60 backdrop-blur-xl border-b border-white/[0.08] flex items-center px-6 justify-between relative select-none">
+    <div className="w-full h-16 bg-gradient-to-r from-black/60 to-[rgba(10,10,12,0.4)] backdrop-blur-3xl border-b border-white/[0.08] shadow-[inset_0_-1px_15px_rgba(255,255,255,0.015)] flex items-center px-6 justify-between relative select-none z-50">
       
       {/* Left side Logo & Title */}
       <Link href="/" className="flex items-center space-x-3 cursor-pointer group">

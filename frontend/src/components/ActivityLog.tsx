@@ -3,56 +3,61 @@
 import { useZoneStore } from '@/store/useZoneStore'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Terminal } from 'lucide-react'
+import { useState, useEffect } from 'react'
+
+const TypewriterLog = ({ text }: { text: string }) => {
+  const [displayed, setDisplayed] = useState('')
+  useEffect(() => {
+    let i = 0
+    setDisplayed('')
+    const timer = setInterval(() => {
+      setDisplayed(text.substring(0, i))
+      i++
+      if (i > text.length) clearInterval(timer)
+    }, 30) // Speed of typing
+    return () => clearInterval(timer)
+  }, [text])
+  return <span>{displayed}</span>
+}
 
 export function ActivityLog() {
-  const logs = useZoneStore((state) => state.logs)
+  const history = useZoneStore((state) => state.incidentHistory)
 
   return (
-    <div className="w-full h-full flex flex-col p-5 bg-transparent">
-      <div className="flex items-center justify-between mb-4 pb-2 border-b border-white/[0.08]">
-        <h3 className="text-sm font-medium text-white/60 flex items-center gap-2 pointer-events-auto">
-          <Terminal className="w-3 h-3 text-white/60" /> Activity Log
+    <div className="w-full h-full flex flex-col p-4 bg-transparent">
+      <div className="flex items-center justify-between mb-3 pb-2 border-b border-white/[0.08]">
+        <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2 pointer-events-auto">
+          <Terminal className="w-3.5 h-3.5 text-accent" /> Incident History
         </h3>
       </div>
       
-      {logs.length === 0 ? (
+      {history.length === 0 ? (
         <div className="flex-grow flex items-center justify-center font-mono text-[9px] text-accent/60 tracking-wider">
           <div className="flex items-center gap-1.5">
-            <span>&gt; MONITORS ACTIVE. AWAITING INTRUSION TELEMETRY</span>
+            <span>&gt; SYSTEM NOMINAL. NO INCIDENTS DETECTED.</span>
             <span className="w-1 h-3 bg-accent animate-pulse rounded-sm" />
           </div>
         </div>
       ) : (
-        <div className="flex-1 overflow-hidden flex flex-col justify-end space-y-2 relative">
-        {/* List of Logs */}
-        
+        <div className="flex-1 overflow-y-auto flex flex-col justify-start space-y-2 relative no-scrollbar">
         <AnimatePresence>
-          {logs.slice(0, 10).map((log, i) => {
-            const isCritical = log.severity === 'critical'
-            const isResolved = log.severity === 'resolved'
-            let color = 'text-gray-400'
-            if (isCritical) color = 'text-red-400'
-            else if (log.severity === 'warning') color = 'text-yellow-400'
-            else if (isResolved) color = 'text-green-400'
-
+          {history.map((log, i) => {
+            const isAuth = log.log.includes('AUTHORIZED')
             return (
               <motion.div
                 layout
-                key={log.id}
+                key={i}
                 initial={{ opacity: 0, y: -10, scale: 0.98 }}
-                animate={{ opacity: 1 - (i * 0.1), y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.98 }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className={`text-xs font-mono bg-black/40 backdrop-blur-sm border-l-2 ${
-                  isCritical ? 'border-red-500' : isResolved ? 'border-green-500' : 'border-yellow-500'
-                } p-3 rounded-r pointer-events-auto`}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                className={`text-[10px] font-mono bg-black/40 backdrop-blur-sm border-l-2 ${
+                  isAuth ? 'border-accent text-accent' : 'border-gray-500 text-gray-300'
+                } p-2 rounded-r pointer-events-auto`}
               >
-                <div className="flex justify-between text-[9px] mb-1">
-                  <span className="text-gray-500">{new Date(log.timestamp).toLocaleTimeString()}</span>
-                  <span className={color}>{log.zone_name}</span>
+                <div className="flex justify-between text-[8px] mb-0.5">
+                  <span className="text-gray-500">{log.time}</span>
                 </div>
-                <div className="text-gray-300">
-                  {log.explanation}
+                <div className="">
+                  <TypewriterLog text={log.log} />
                 </div>
               </motion.div>
             )

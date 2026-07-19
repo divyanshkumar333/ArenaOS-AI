@@ -66,7 +66,7 @@ function AnimatedNumber({ value }: { value: string | number }) {
       initial={{ opacity: 0, y: -5 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="inline-block"
+      className="inline-block kpi-number"
     >
       {displayValue}
     </motion.span>
@@ -161,7 +161,7 @@ export const KPICards = React.memo(function KPICards() {
         return (
           <div
             key={i}
-            className="relative flex flex-col p-3.5 bg-[rgba(10,10,12,0.4)] backdrop-blur-2xl border border-white/[0.04] rounded-xl overflow-hidden group transition-all duration-300 hover:border-white/10"
+            className="relative flex flex-col p-3.5 bg-gradient-to-b from-[#101012]/80 to-transparent bg-black/40 backdrop-blur-3xl border border-white/[0.08] shadow-[inset_0_0_15px_rgba(255,255,255,0.02)] rounded-[16px] overflow-hidden group transition-all duration-300 hover:border-white/15 hover:shadow-[0_0_20px_rgba(255,255,255,0.05)]"
           >
             {/* Top border glow themed */}
             <div className="absolute top-0 left-0 right-0 h-[2px] opacity-60 transition-opacity duration-300 group-hover:opacity-100" style={{ backgroundColor: c.color }} />

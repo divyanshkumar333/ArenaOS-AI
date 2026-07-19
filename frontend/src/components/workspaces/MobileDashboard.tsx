@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useZoneStore } from '@/store/useZoneStore'
-import { StadiumCanvas } from '@/components/StadiumCanvas'
+import dynamic from 'next/dynamic'
+// @ts-ignore
+const StadiumCanvas = dynamic(() => import('@/components/StadiumCanvas').then(mod => mod.default as React.ComponentType), { ssr: false })
 import { BootSequenceOverlay } from '@/components/BootSequenceOverlay'
 import { KPICards } from '@/components/KPICards'
 import { IncidentPanel } from '@/components/IncidentPanel'
@@ -9,7 +11,8 @@ import { AICopilot } from '@/components/AICopilot'
 import { TelemetryFeed } from '@/components/TelemetryFeed'
 import { ActivityLog } from '@/components/ActivityLog'
 import { Sidebar } from '@/components/Sidebar'
-import { Activity, Radar, Bot, Menu, X } from 'lucide-react'
+import { Activity, Wifi, Signal, Cpu, Menu, X } from 'lucide-react'
+import '../AmbientAnimations.css'
 import { ArenaLogo } from '@/components/ArenaLogo'
 
 // BottomSheet slides up from the bottom covering 85% of the screen.
@@ -30,6 +33,12 @@ const BottomSheet = ({
   <AnimatePresence>
     {activeSheet === id && (
       <motion.div
+        role="dialog"
+        aria-modal="true"
+        tabIndex={-1}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') setActiveSheet(null);
+        }}
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
@@ -59,14 +68,24 @@ const BottomSheet = ({
       </motion.div>
     )}
   </AnimatePresence>
-)
+);
 
+// Sidebar memoized above
 export function MobileDashboard() {
+  const zones = useZoneStore((state) => state.zones);
+  const gate3Occupancy = zones.find(z => z.id === 'zone_1')?.occupancy || 0;
   const activeIncident = useZoneStore((state) => state.activeIncident)
   const [activeSheet, setActiveSheet] = useState<string | null>(null)
 
   return (
-    <div className="relative w-full h-full bg-black flex flex-col overflow-hidden">
+    <>
+      {/* Floating holographic markers */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="holo-marker" style={{ top: '20%', left: '30%' }} />
+        <div className="holo-marker" style={{ top: '50%', left: '70%' }} />
+        <div className="holo-marker" style={{ top: '80%', left: '40%' }} />
+      </div>
+      <div className="relative w-full h-full bg-black flex flex-col overflow-hidden">
 
       {/* Mobile Top Bar */}
       <div className="absolute top-0 left-0 w-full z-40 px-4 py-3 flex items-center justify-between pointer-events-none">
@@ -81,7 +100,7 @@ export function MobileDashboard() {
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-red-500/20 border border-red-500/40 text-red-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest pointer-events-auto flex items-center gap-1"
+            className="bg-[rgba(10,10,12,0.85)] border border-accent/30 p-2.5 rounded-lg text-[9px] font-mono text-accent uppercase whitespace-nowrap shadow-2xl backdrop-blur-xl flex flex-col gap-0.5 min-w-[120px] holo-flicker"
           >
             <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
             Incident
@@ -111,25 +130,24 @@ export function MobileDashboard() {
         {/* Digital Twin */}
         <button
           onClick={() => setActiveSheet(null)}
-          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors ${
-            !activeSheet ? 'text-accent bg-accent/10' : 'text-gray-500'
-          }`}
+          className={`w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg transition-all duration-200 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${!activeSheet ? 'bg-accent/10 text-accent border border-accent/25 font-semibold' : 'text-white/60 hover:bg-white/5 hover:text-white border border-transparent'}`}
           aria-label="Digital Twin view"
         >
-          <Radar className="w-5 h-5" />
+          <div className={`radar-sweep ${gate3Occupancy > 80 ? 'gate-marker-pulse' : ''}`}>
+            <Signal className="w-5 h-5" />
+          </div>
           <span className="text-[9px] uppercase tracking-wider font-mono">Twin</span>
         </button>
 
         {/* AI Copilot */}
         <button
           onClick={() => setActiveSheet('copilot')}
-          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors ${
-            activeSheet === 'copilot' ? 'text-accent bg-accent/10' : 'text-gray-500'
-          }`}
+          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors ${activeSheet === 'copilot' ? 'text-accent bg-accent/10' : 'text-gray-500'
+            }`}
           aria-label="AI Copilot"
         >
           <div className="relative">
-            <Bot className="w-5 h-5" />
+            <Cpu className="w-5 h-5" />
             {activeIncident && (
               <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
             )}
@@ -140,21 +158,19 @@ export function MobileDashboard() {
         {/* Live Telemetry */}
         <button
           onClick={() => setActiveSheet('telemetry')}
-          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors ${
-            activeSheet === 'telemetry' ? 'text-accent bg-accent/10' : 'text-gray-500'
-          }`}
+          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors ${activeSheet === 'telemetry' ? 'text-accent bg-accent/10' : 'text-gray-500'
+            }`}
           aria-label="Live telemetry"
         >
-          <Activity className="w-5 h-5" />
+          <Wifi className="w-5 h-5" />
           <span className="text-[9px] uppercase tracking-wider font-mono">Sensors</span>
         </button>
 
         {/* Sidebar / Menu */}
         <button
           onClick={() => setActiveSheet('menu')}
-          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors ${
-            activeSheet === 'menu' ? 'text-accent bg-accent/10' : 'text-gray-500'
-          }`}
+          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors ${activeSheet === 'menu' ? 'text-accent bg-accent/10' : 'text-gray-500'
+            }`}
           aria-label="Navigation menu"
         >
           <Menu className="w-5 h-5" />
@@ -178,7 +194,7 @@ export function MobileDashboard() {
         setActiveSheet={setActiveSheet}
         title="Live Telemetry"
       >
-        <div className="flex flex-col gap-4">
+        <div className="h-full w-full flex flex-col p-5 bg-transparent telemetry-feed-marquee">
           <div className="h-64 border border-white/[0.04] rounded-xl overflow-hidden bg-black/40">
             <TelemetryFeed />
           </div>
@@ -198,5 +214,5 @@ export function MobileDashboard() {
         <Sidebar />
       </BottomSheet>
     </div>
-  )
+  </> )
 }

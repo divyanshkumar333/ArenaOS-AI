@@ -1,0 +1,61 @@
+/* AmbientAnimations.css - lightweight CSS animations for Phase 1 */
+
+/* Rotating radar sweep */
+@keyframes radar-sweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.radar-sweep {
+  animation: radar-sweep 6s linear infinite;
+}
+
+/* Pulsing gate marker */
+@keyframes gate-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+.gate-marker-pulse {
+  animation: gate-pulse 2s ease-in-out infinite;
+}
+
+/* Telemetry feed scrolling (marquee style) */
+@keyframes telemetry-marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+.telemetry-feed-marquee {
+  overflow: hidden;
+  white-space: nowrap;
+  display: block;
+}
+.telemetry-feed-marquee > * {
+  display: inline-block;
+  animation: telemetry-marquee 20s linear infinite;
+}
+
+/* KPI number smooth transition */
+.kpi-number {
+  display: inline-block;
+}
+
+/* Subtle hologram flicker */
+@keyframes holo-flicker {
+  0%, 100% { opacity: 0.95; }
+  50% { opacity: 0.85; }
+}
+.holo-flicker {
+  animation: holo-flicker 3s ease-in-out infinite;
+}
+
+/* Floating holographic marker */
+@keyframes float-up {
+  0% { transform: translateY(0px); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(-30px); opacity: 0; }
+}
+.holo-marker {
+  position: absolute;
+  pointer-events: none;
+  animation: float-up 4s ease-in-out infinite;
+}

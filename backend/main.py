@@ -81,6 +81,7 @@ manager = ConnectionManager()
 
 @app.on_event("startup")
 async def startup_event():
+    camera_service.engine = engine
     camera_service.start()
     asyncio.create_task(telemetry_loop())
 
@@ -118,6 +119,41 @@ async def trigger_incident(req: TriggerRequest):
     # Call AI Agent (this has a 3.5s timeout built-in)
     ai_response = await analyze_incident(zone, req.incident_type)
     
+    # Generate mock evidence to populate the IncidentPanel on the frontend
+    import random
+    if req.incident_type == "Gate 3 Overcrowding":
+        evidence = {
+            "queueLength": random.randint(340, 410),
+            "averageWait": random.randint(14, 22),
+            "exitCapacity": random.randint(180, 240),
+            "predictedOverflow": random.randint(4, 9),
+            "supportingData": ["CCTV Feed: CAM-01", "Gate 3 Turnstiles", "Gate 3 Outer Plaza Count", "Ticket Validation Rate"]
+        }
+    elif req.incident_type == "Section 112 Medical Event":
+        evidence = {
+            "queueLength": random.randint(45, 75),
+            "averageWait": random.randint(2, 5),
+            "exitCapacity": random.randint(30, 45),
+            "predictedOverflow": random.randint(1, 3),
+            "supportingData": ["Wearable Smart Sensor: ID-8820", "CAM-04 Sector Feed", "Section 112 Ingress Flow", "Staff Dispatch Status"]
+        }
+    elif req.incident_type == "Concourse North Fire Alarm":
+        evidence = {
+            "queueLength": random.randint(120, 180),
+            "averageWait": random.randint(5, 8),
+            "exitCapacity": random.randint(80, 120),
+            "predictedOverflow": random.randint(2, 4),
+            "supportingData": ["Smoke Detector: ZONE-03", "Thermal Sensor: S4-C1", "Concourse North Flow Rate", "Emergency Exit Capacity"]
+        }
+    else:
+        evidence = {
+            "queueLength": 0,
+            "averageWait": 0,
+            "exitCapacity": 0,
+            "predictedOverflow": 0,
+            "supportingData": ["System Telemetry Log"]
+        }
+
     # Construct the incident payload
     incident_payload = {
         "type": "incident",
@@ -127,7 +163,8 @@ async def trigger_incident(req: TriggerRequest):
         "severity": ai_response["severity"],
         "explanation": ai_response["explanation"],
         "recommended_action": ai_response["recommended_action"],
-        "confidence": ai_response["confidence"]
+        "confidence": ai_response["confidence"],
+        "evidence": evidence
     }
     
     # Broadcast the incident message over the same WebSocket

@@ -6,11 +6,11 @@ import { motion } from "framer-motion"
 import { Eye, Brain, Search, Lightbulb, Play, CheckCircle, Rocket, BarChart, GitMerge } from "lucide-react"
 
 const STAGES = [
-  { id: 'ANOMALY_DETECTED', label: 'Anomaly Detected', icon: Eye },
-  { id: 'AI_ANALYZING', label: 'AI Analyzing', icon: Brain },
-  { id: 'REASONING_COMPLETE', label: 'Reasoning Complete', icon: Search },
-  { id: 'SCENARIO_SELECTION', label: 'Scenario Selection', icon: Lightbulb },
-  { id: 'EXECUTING', label: 'Executing Plan', icon: Rocket }
+  { id: 'SCANNING_CCTV', label: 'Scanning CCTV', icon: Eye },
+  { id: 'CHECKING_SCANS', label: 'Checking ticket scans', icon: Search },
+  { id: 'COMPARING_HISTORICAL', label: 'Comparing historical events', icon: Brain },
+  { id: 'ANALYZING_FLOW', label: 'Analyzing pedestrian flow', icon: BarChart },
+  { id: 'RUNNING_PREDICTION', label: 'Running prediction', icon: Rocket }
 ]
 
 export function AiReasoningPipeline() {
@@ -20,13 +20,14 @@ export function AiReasoningPipeline() {
   useEffect(() => {
     if (activeIncident) {
       setCurrentStageIndex(0)
-      const t1 = setTimeout(() => setCurrentStageIndex(1), 100)
-      const t2 = setTimeout(() => setCurrentStageIndex(2), 300)
-      const t3 = setTimeout(() => setCurrentStageIndex(3), 450)
-      const t4 = setTimeout(() => setCurrentStageIndex(4), 600)
+      const t1 = setTimeout(() => setCurrentStageIndex(1), 800)
+      const t2 = setTimeout(() => setCurrentStageIndex(2), 1600)
+      const t3 = setTimeout(() => setCurrentStageIndex(3), 2800)
+      const t4 = setTimeout(() => setCurrentStageIndex(4), 4000)
+      const t5 = setTimeout(() => setCurrentStageIndex(5), 5200) // All complete
       
       return () => {
-        clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4);
+        clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); clearTimeout(t5);
       }
     } else {
       setCurrentStageIndex(-1)
@@ -78,7 +79,7 @@ export function AiReasoningPipeline() {
                   isCompleted ? "text-white/70" :
                   "text-gray-500/30"
                 }`}>
-                  {stage.label}
+                  {isCompleted && i === 4 ? "Prediction Complete" : stage.label}
                 </span>
                 
                 {isActive && (

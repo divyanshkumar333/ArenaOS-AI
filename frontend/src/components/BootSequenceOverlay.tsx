@@ -33,6 +33,24 @@ export function BootSequenceOverlay() {
     }
   }, [progress, active])
 
+  // Fallback auto-progression when not actively loading (e.g. cached or idle)
+  useEffect(() => {
+    if (!active && bootPhase < 6) {
+      const timer = setInterval(() => {
+        setBootPhase(p => {
+          if (p >= 6) {
+            clearInterval(timer)
+            return 6
+          }
+          return p + 1
+        })
+      }, 400)
+      return () => clearInterval(timer)
+    }
+  }, [active, bootPhase])
+
+  const displayProgress = active ? progress : [0, 15, 35, 55, 75, 90, 100][bootPhase]
+
   return (
     <AnimatePresence>
       {(active || bootPhase < 6) && (
@@ -45,7 +63,7 @@ export function BootSequenceOverlay() {
           <div className="w-96">
             <div className="flex justify-between text-xs text-accent mb-2">
               <span>SYS.BOOT</span>
-              <span>{Math.round(progress)}%</span>
+              <span>{Math.round(displayProgress)}%</span>
             </div>
             
             {/* Progress Bar */}
@@ -53,7 +71,7 @@ export function BootSequenceOverlay() {
               <motion.div 
                 className="h-full bg-accent"
                 initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
+                animate={{ width: `${displayProgress}%` }}
                 transition={{ ease: "linear" }}
               />
             </div>
