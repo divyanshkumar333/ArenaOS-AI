@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic'
 // @ts-ignore
 const StadiumCanvas = dynamic(() => import('@/components/StadiumCanvas').then(mod => mod.StadiumCanvas as React.ComponentType), { ssr: false })
 import { BootSequenceOverlay } from '@/components/BootSequenceOverlay'
-import { KPICards } from '@/components/KPICards'
+
 import { IncidentPanel } from '@/components/IncidentPanel'
 import { AICopilot } from '@/components/AICopilot'
 import { TelemetryFeed } from '@/components/TelemetryFeed'
@@ -114,13 +114,7 @@ export function MobileDashboard() {
         <StadiumCanvas />
       </div>
 
-      {/* Horizontally scrollable KPI strip */}
-      <div className="absolute top-14 left-0 w-full z-30 pointer-events-auto overflow-x-auto snap-x snap-mandatory px-4 pb-2"
-        style={{ scrollbarWidth: 'none' }}>
-        <div className="flex gap-3 w-max">
-          <KPICards />
-        </div>
-      </div>
+      {/* Cards removed for cleaner mobile 3D experience */}
 
       {/* Bottom Navigation Bar */}
       <nav
