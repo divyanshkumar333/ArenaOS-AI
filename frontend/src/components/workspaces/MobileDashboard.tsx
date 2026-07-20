@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useZoneStore } from '@/store/useZoneStore'
 import dynamic from 'next/dynamic'
 // @ts-ignore
-const StadiumCanvas = dynamic(() => import('@/components/StadiumCanvas').then(mod => mod.default as React.ComponentType), { ssr: false })
+const StadiumCanvas = dynamic(() => import('@/components/StadiumCanvas').then(mod => mod.StadiumCanvas as React.ComponentType), { ssr: false })
 import { BootSequenceOverlay } from '@/components/BootSequenceOverlay'
 import { KPICards } from '@/components/KPICards'
 import { IncidentPanel } from '@/components/IncidentPanel'

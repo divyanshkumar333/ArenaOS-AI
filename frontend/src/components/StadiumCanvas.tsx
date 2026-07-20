@@ -669,7 +669,7 @@ export function StadiumCanvas() {
   const vantaEffect = useRef<any>(null)
 
   useEffect(() => {
-    if (!vantaRef.current || vantaEffect.current) return
+    if (!vantaRef.current || vantaEffect.current || (typeof window !== 'undefined' && window.innerWidth < 768)) return
     let cancelled = false
     import('vanta/dist/vanta.clouds.min').then((mod) => {
       if (cancelled || !vantaRef.current) return
@@ -811,7 +811,7 @@ export function StadiumCanvas() {
   return (
     <div className="absolute inset-0 bg-[#050510] select-none">
       {/* Vanta CLOUDS background */}
-      <div ref={vantaRef} className="absolute inset-0" style={{ zIndex: 0 }} />
+      {!isMobile && <div ref={vantaRef} className="absolute inset-0" style={{ zIndex: 0 }} />}
 
       {/* Canvas */}
       <Canvas dpr={isMobile ? [1, 1] : [1, 2]} camera={{ position: [350, 250, 350], fov: 45 }} shadows={!isMobile} gl={{ alpha: true, antialias: !isMobile }} style={{ position: 'relative', zIndex: 1, background: 'transparent' }}>
